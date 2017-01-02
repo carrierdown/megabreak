@@ -12,13 +12,13 @@
 #include <ctype.h>
 #include <dos.h>
 #include <graph.h>
-#include "e:\data\programs\projects\mylibs\standard.h"
-#include "e:\data\programs\projects\mylibs\w_mlib.h"    // Mouse-library
-#include "e:\data\programs\projects\mylibs\gfxlib.h"   // Gfx-header
-#include "e:\data\programs\projects\mylibs\imageio.h"
-#include "e:\data\programs\projects\mylibs\stdtext.h"
-#include "e:\data\programs\projects\mylibs\font.h"
-#include "e:\data\programs\projects\mylibs\random.h"
+#include "libs\standard.h"
+#include "libs\w_mlib.h"    // Mouse-library
+#include "libs\gfxlib.h"   // Gfx-header
+#include "libs\imageio.h"
+#include "libs\stdtext.h"
+#include "libs\font.h"
+#include "libs\random.h"
 #include "brkfunc.h"
 
 
