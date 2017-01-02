@@ -6,7 +6,7 @@ I started this project way back in 1995, at the age of 15. My goal was to create
 
 ![MegaBreak gameplay](https://github.com/carrierdown/megabreak/raw/master/megabreak-first-two-levels.gif "Megabreak gameplay: first two levels")
 
-Note: This GIF does not accurately depict the actual frame rate of the game, which is a lot more fluid ;)
+Note: This GIF does not accurately depict the actual frame rate of the game, which is a lot higher ;)
 
 ## Graphics
 
@@ -14,4 +14,12 @@ The graphics for the game were all created using Deluxe Paint II, which original
 
 ![MegaBreak sprite sheets](https://github.com/carrierdown/megabreak/raw/master/megabreak-asset-sheet-x2.png "Megabreak sprite sheets")
 
+## Sound
 
+Given the amount of time and effort I've put into music and sound for the past 15+ years of my life, it's a bit ironic that MegaBreak features no sound or music at all. The reason for this is however purely technical. Implementing sound in a DOS environment was not trivial, and although there were some libraries available at the time to ease the process, I was unable to get any of these to work together with my choice of compiler and memory model (see the next paragraph for more on this), although I don't remember the details.
+
+## Compiler and memory model
+
+I used the Watcom C compiler to build the game. The main reason for choosing this particular compiler was that it made it easy to incorporate the DOS4GW protected mode extender, which removed the 640k limit and segmented memory model normally imposed on DOS programs. With DOS4GW, memory could be addressed linearly using 32-bit registers rather than the conventional segmented model.
+
+Although I haven't tested this, it should be possible to build the game using an open source compiler and the DOS/32 extender, which is essentially an open source version of DOS4GW.
