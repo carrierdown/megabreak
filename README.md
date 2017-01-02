@@ -16,7 +16,7 @@ The graphics for the game were all created using Deluxe Paint II, which original
 
 ## Sound
 
-Given the amount of time and effort I've put into music and sound for the past 15+ years of my life, it's a bit ironic that MegaBreak features no sound or music at all. The reason for this is however purely technical. Implementing sound in a DOS environment was not trivial, and although there were some libraries available at the time to ease the process, I was unable to get any of these to work together with my choice of compiler and memory model (see the next paragraph for more on this), although I don't remember the details.
+Given the amount of time and effort I've put into [music and sound](http://upland.no) for the past 15+ years of my life, it's a bit ironic that MegaBreak features no sound or music at all. The reason for this is however purely technical. Implementing sound in a DOS environment was not trivial, and although there were some libraries available at the time to ease the process, I was unable to get any of these to work together with my choice of compiler and memory model (see the next paragraph for more on this), although I don't remember the details.
 
 ## Compiler and memory model
 
