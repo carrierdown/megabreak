@@ -23,3 +23,12 @@ Given the amount of time and effort I've put into [music and sound](http://uplan
 I used the Watcom C compiler to build the game. The main reason for choosing this particular compiler was that it made it easy to incorporate the DOS4GW protected mode extender, which removed the 640k limit and segmented memory model normally imposed on DOS programs. With DOS4GW, memory could be addressed linearly using 32-bit registers rather than the conventional segmented model.
 
 Although I haven't tested this, it should be possible to build the game using an open source compiler and the DOS/32 extender, which is essentially an open source version of DOS4GW.
+
+## Level editor
+
+MegaBreak features its own level editor, which can be used to quickly create levels for the game. The editor is invoked from the command line with a filename, which opens a graphical editor where you can draw a level using the different brick types. The output is written into a 260 byte .MAP file, which contains the level data. Starting the megabreak executable itself with the option -mylevels enables you to run the game using any self-designed .MAP files residing in the main directory of the game.
+
+## Sequel plans
+
+I did plan a sequel for a while following the release of the first game. I teamed up with a friend for this project, and our intent was to get the game running on Windows using DirectX. Due to various reasons and shifting priorities, the project never materialized. However, I did create some preliminary graphics for it, including a mock game screen, some sprites, different brick types, and a basic font. This was done around 1998-99.
+
