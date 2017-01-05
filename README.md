@@ -32,3 +32,6 @@ MegaBreak features its own level editor, which can be used to quickly create lev
 
 I did plan a sequel for a while following the release of the first game. I teamed up with a friend for this project, and our intent was to get the game running on Windows using DirectX. Due to various reasons and shifting priorities, the project never materialized. However, I did create some preliminary graphics for it, including a mock game screen, some sprites, different brick types, and a basic font. This was done around 1998-99.
 
+## Project overview
+
+TBW
