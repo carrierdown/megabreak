@@ -28,9 +28,17 @@ Although I haven't tested this, it should be possible to build the game using an
 
 MegaBreak features its own level editor, which can be used to quickly create levels for the game. The editor is invoked from the command line with a filename, which opens a graphical editor where you can draw a level using the different brick types. The output is written into a 260 byte .MAP file, which contains the level data. Starting the megabreak executable itself with the option -mylevels enables you to run the game using any self-designed .MAP files residing in the main directory of the game.
 
+![Level editor](https://github.com/carrierdown/megabreak/raw/master/level-editor.png "Level editor")
+
+## Mock advertising
+
+TBW
+
 ## Sequel plans
 
 I did plan a sequel for a while following the release of the first game. I teamed up with a friend for this project, and our intent was to get the game running on Windows using DirectX. Due to various reasons and shifting priorities, the project never materialized. However, I did create some preliminary graphics for it, including a mock game screen, some sprites, different brick types, and a basic font. This was done around 1998-99.
+
+![MegaBreak 2 mock screenshot](https://github.com/carrierdown/megabreak/raw/master/megabreak-2-mock-screenshot.png "Megabreak 2 mock screenshot")
 
 ## Project overview
 
