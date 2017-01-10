@@ -32,7 +32,11 @@ MegaBreak features its own level editor, which can be used to quickly create lev
 
 ## Mock advertising
 
-TBW
+I also created some mock advertising for the game, including a banner ad typical for the time, and a parody of the widely used "Netscape Now!" and similar buttons. 
+
+![MegaBreak mock ad](https://github.com/carrierdown/megabreak/raw/master/megabreak-mock-ad.gif)
+
+![MegaBreak Now!](https://github.com/carrierdown/megabreak/raw/master/megabreak-now.gif)
 
 ## Sequel plans
 
@@ -40,6 +44,6 @@ I did plan a sequel for a while following the release of the first game. I teame
 
 ![MegaBreak 2 mock screenshot](https://github.com/carrierdown/megabreak/raw/master/megabreak-2-mock-screenshot.png "Megabreak 2 mock screenshot")
 
-## Project overview
+![MegaBreak 2 bat sprite](https://github.com/carrierdown/megabreak/raw/master/mb2-bat-animated.gif "MegaBreak 2 bat sprite")
 
-TBW
+![MegaBreak 2 assorted graphics](https://github.com/carrierdown/megabreak/raw/master/mb2-art.png)
