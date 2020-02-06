@@ -14,9 +14,10 @@ void bput_block(long x, long y, long xlen, long ylen, byte *imgpnt, byte *scr);
 void do_bput_block(struct BPutBlockParams *putBlockParams, byte *imgpnt, byte *scr);
 void put_block(long x, long y, long xlen, long ylen, byte *imgpnt);
 void do_put_block(struct PutBlockParams *putBlockParams, byte *imgpnt);
+void cput_block(long x, long y, long xlen, long ylen, byte *imgpnt);
+void do_cput_block(struct CPutBlockParams *putBlockParams, byte *imgpnt);
 
 extern "C" {
-void cput_block(long x, long y, long xlen, long ylen, byte *imgpnt); // *
 void bdraw_box(long X, long Y, long xlen, long ylen, long colour, byte *scr); // *
 void put_sprite(long,long,long,long,byte *); // *
 void bput_sprite(long,long,long,long,byte *, byte *); // *
@@ -200,3 +201,76 @@ void put_block(long x, long y, long xlen, long ylen, byte *imgpnt)
 parm [ebx] [esi] \
 modify [eax ebx ecx edx edi];
 
+long _clipart = 0;
+long _x = 0;
+long _y = 0;
+long _xlen = 0;
+long _ylen = 0;
+
+void cput_block(long x, long y, long xlen, long ylen, byte *imgpnt)
+{
+    PutBlockParams params;
+    params.x = x;
+    params.y = y;
+    params.xlen = xlen;
+    params.ylen = ylen;
+    do_cput_block(&params, imgpnt);
+}
+
+#pragma aux do_cput_block = \
+    "mov    _x, [ebx]" \
+    "mov    _y, [ebx + 4]" \
+    "mov    _xlen, [ebx + 8]" \
+    "mov    _ylen, [ebx + 12]" \
+    "mov    eax,_y" \
+    "mov    ebx,_x" \
+    "cmp    ebx, 319" /* Are coords outside screen? */ \
+    "ja     cend" \
+    "cmp    eax, 199" \
+    "ja     cend" \
+    "add    ebx, _xlen" /* No - should the whole block be drawn? */ \
+    "add    eax, _ylen" \
+    "cmp    ebx, 319" \
+    "jle    normal_put" \
+    "cmp    eax, 199" \
+    "jle    normal_put" \
+    "sub    ebx, 319" \
+    "sub    eax, 199" \
+    "mov    _clipart, 0" \
+    "cmp    ebx, 0" \
+    "ja     new_xlen" \
+    "cmp    eax, 0" \
+    "ja     new_ylen" \
+    "jmp    normal_put" \
+"new_xlen:" \
+    "sub    _xlen, ebx" \
+    "mov    clipart, ebx" \
+    "jmp    normal_put" \
+"new_ylen:" \
+    "sub    _ylen, eax" \
+"normal_put:" \
+    "mov    eax,_y" \
+    "mov    _y, ebx" \
+    "mov    ebx,_x" \
+    "mov    edi,0A0000h"          /* Video-mem... */ \
+    "mov    ecx,eax" \
+    "shl    eax,8" \
+    "shl    ecx,6" \
+    "add    eax,ecx"             /* Legg sammen begge Y-ene */ \
+    "add    eax,ebx"             /* Legg til X */ \
+    "add    edi,eax"             /* Ferdig koordinat ligger nå i EDI */ \
+    "mov    edx,320"             /* Kalkuler mengde som må legges til EDI på */ \
+    "mov    ebx,_xlen"          /* slutten av hver linje. */ \
+    "sub    edx,ebx"          /* Mengde ligger i EDX */ \
+    "mov    eax,_ylen"          /* Legg vertikal teller i EAX */ \
+"cnext_line:" \
+    "mov    ecx,ebx"          /* Legg linje-teller i ECX */ \
+    "rep    movsb"               /* Tegn opp en linje.. */ \
+    "dec    eax"                 /* En linje mindre.. */ \
+    "add    edi,edx"             /* Legg til slik at neste linje begynner under.. */ \
+    "add    esi,_clipart" \
+    "or     eax,eax"             /* Vertikal teller 0 ennå? */ \
+    "jnz    cnext_line"          /* Nei - gå til neste linje */ \
+"cend:" \
+parm [ebx] [esi] \
+modify [eax ebx ecx edx esi edi];
