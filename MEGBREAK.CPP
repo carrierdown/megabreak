@@ -316,7 +316,7 @@ shot    *Shot = NULL,
 byte brickmap[42][260];
 
 
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	/*
 		** Variabler og strukturer **
