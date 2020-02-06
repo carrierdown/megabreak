@@ -316,6 +316,7 @@ void text_colourbar(byte x, byte offset)
 
 void set_redpalette()
 {
+    int i;
     byte r, g, b, o;
     signed char ri, gi, bi;
 
@@ -328,7 +329,7 @@ void set_redpalette()
     bi = 0;
 
     // Ordne pal-registre
-    for (int i = 0; i < 16; i ++)
+    for (i = 0; i < 16; i ++)
         set_palreg(i, i);
 
     for (i = 15; i >= 0; i --) {

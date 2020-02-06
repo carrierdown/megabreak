@@ -2474,6 +2474,7 @@ void startup()
 
 void read_config()
 {
+    int ii;
     FILE *handle;
 
     handle = fopen("gfx.dat", "r+b");
@@ -2491,7 +2492,7 @@ void read_config()
         speed = 2.0;
 
     for (int t=0; t<10; t++) {
-        for (int ii=0; ii<9; ii++)
+        for (ii=0; ii<9; ii++)
             hiscore_table[t].name[ii] = getc(handle);
         hiscore_table[t].level = getc(handle);
 
