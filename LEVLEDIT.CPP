@@ -8,11 +8,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream.h>
-#include "e:\data\programs\projects\mylibs\w_mlib.h"   // Mouse-library
-#include "e:\data\programs\projects\mylibs\gfxlib.h"  // Gfx-header
-#include "e:\data\programs\projects\mylibs\imageio.h"
-#include "e:\data\programs\projects\mylibs\stdtext.h"
+#include "libs\w_mlib.h"    // Mouse-library
+#include "libs\gfxlib.h"   // Gfx-header
+#include "libs\imageio.h"
+#include "libs\stdtext.h"
 #include "brkfunc.h"
+
 
 
 
