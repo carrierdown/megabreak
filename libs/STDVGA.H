@@ -15,30 +15,31 @@ void do_bput_block(struct PutBlockParams *putBlockParams, byte *imgpnt, byte *sc
 void put_block(long x, long y, long xlen, long ylen, byte *imgpnt);
 void do_put_block(struct PutBlockParams *putBlockParams, byte *imgpnt);
 void cput_block(long x, long y, long xlen, long ylen, byte *imgpnt);
-void do_cput_block(struct CPutBlockParams *putBlockParams, byte *imgpnt);
+void do_cput_block(struct PutBlockParams *putBlockParams, byte *imgpnt);
 void bdraw_box(long x, long y, long xlen, long ylen, long colour, byte *scr);
-void do_bdraw_box(struct BoxParams *boxParams);
+void do_bdraw_box(struct BoxParams *boxParams, byte *scr);
 void put_sprite(long x, long y, long xlen, long ylen, byte *imgpnt);
 void do_put_sprite(struct PutBlockParams *putBlockParams, byte *imgpnt);
 void bput_sprite(long x, long y, long xlen, long ylen, byte *imgpnt, byte *buffer);
 void do_bput_sprite(struct PutBlockParams *putBlockParams, byte *imgpnt, byte *buffer);
-
-extern "C" {
-void block_copy(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, int destx, int desty); // *
-void block_copy_b(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, int destx, int desty, byte *destimg); // *
-
-void plot(long X, long Y, long colour);
-void h_line(int x, int y, int x2, byte colour);
-void functest(long,long,long,long,long);
-void clear_screen();
-void clear_screen_c(long colour);
-void draw_light(long X, long Y, long xlen, long ylen, byte *lightptr, byte *imgptr);
-void draw_colbar(long,long);
-void screen_copy(byte *dest, byte *src);
-void anti_alias(int x, int y, int xlen, int ylen, byte *scrptr);
-};
-
+void block_copy(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, int destx, int desty);
+void do_block_copy(struct BlockCopyParams *params, byte *buffer);
+void block_copy_b(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, int destx, int desty, byte *destimg);
+void do_block_copy_b(struct BlockCopyParams *params, byte *buffer);
 short detectvga();
+
+long _clipart = 0;
+long _x = 0;
+long _y = 0;
+long _xlen = 0;
+long _ylen = 0;
+long _colour = 0;
+long _srcx = 0;
+long _srcy = 0;
+long _srcxlen = 0;
+long _srcylen = 0;
+long _dstx = 0;
+long _dsty = 0;
 
 #pragma aux detectvga =                \
     "mov    bx, 0xFFFF"                 \
@@ -197,13 +198,6 @@ void put_block(long x, long y, long xlen, long ylen, byte *imgpnt)
 parm [ebx] [esi] \
 modify [eax ebx ecx edx edi];
 
-long _clipart = 0;
-long _x = 0;
-long _y = 0;
-long _xlen = 0;
-long _ylen = 0;
-long _colour = 0;
-
 void cput_block(long x, long y, long xlen, long ylen, byte *imgpnt)
 {
     PutBlockParams params;
@@ -211,14 +205,14 @@ void cput_block(long x, long y, long xlen, long ylen, byte *imgpnt)
     params.y = y;
     params.xlen = xlen;
     params.ylen = ylen;
+    _x = x;
+    _y = y;
+    _xlen = xlen;
+    _ylen = ylen;
     do_cput_block(&params, imgpnt);
 }
 
 #pragma aux do_cput_block = \
-    "mov    _x, [ebx]" \
-    "mov    _y, [ebx + 4]" \
-    "mov    _xlen, [ebx + 8]" \
-    "mov    _ylen, [ebx + 12]" \
     "mov    eax,_y" \
     "mov    ebx,_x" \
     "cmp    ebx, 319" /* Are coords outside screen? */ \
@@ -241,7 +235,7 @@ void cput_block(long x, long y, long xlen, long ylen, byte *imgpnt)
     "jmp    normal_put" \
 "new_xlen:" \
     "sub    _xlen, ebx" \
-    "mov    clipart, ebx" \
+    "mov    _clipart, ebx" \
     "jmp    normal_put" \
 "new_ylen:" \
     "sub    _ylen, eax" \
@@ -280,15 +274,15 @@ void bdraw_box(long x, long y, long xlen, long ylen, long colour, byte *scr)
     params.xlen = xlen;
     params.ylen = ylen;
     params.colour = colour;
+    _x = x;
+    _y = y;
+    _xlen = xlen;
+    _ylen = ylen;
+    _colour = colour;
     do_bdraw_box(&params, scr);
 }
 
 #pragma aux do_bdraw_box = \
-    "mov    _x, [ebx]" \
-    "mov    _y, [ebx + 4]" \
-    "mov    _xlen, [ebx + 8]" \
-    "mov    _ylen, [ebx + 12]" \
-    "mov    _colour, [ebx + 16]" \
     "mov    eax,_y" \
     "mov    ebx,_x" \
     "mov    ecx,eax"       /* Calculate pixel-position.. */ \
@@ -324,57 +318,55 @@ void put_sprite(long x, long y, long xlen, long ylen, byte *imgpnt)
     params.y = y;
     params.xlen = xlen;
     params.ylen = ylen;
+    _x = x;
+    _y = y;
+    _xlen = xlen;
+    _ylen = ylen;
     do_put_sprite(&params, imgpnt);
 }
 
 #pragma aux do_put_sprite = \
-    "mov    _x, [ebx]" \
-    "mov    _y, [ebx + 4]" \
-    "mov    _xlen, [ebx + 8]" \
-    "mov    _ylen, [ebx + 12]" \
-    "mov     eax,[Y]
-    "mov     ebx,[X]
-    "mov     edi,0A0000h             ; Video-mem...
-    "mov     ecx,eax
-    "shl     eax,8
-    "shl     ecx,6
-    "add     eax,ecx                 ; Legg sammen begge Y-ene
-    "add     eax,ebx                 ; Legg til X
-    "add     edi,eax                 ; Ferdig koordinat ligger nå i EDI
-    "mov     edx,320                 ; Kalkuler mengde som må legges til EDI på
-    "mov     ebx,[XLEN]              ; slutten av hver linje.
-    "sub     edx,ebx                 ; Mengde ligger i EDX
-    "mov     eax,[YLEN]              ; Legg vertikal teller i EAX
-bloop1:
-        mov     ecx,[XLEN]              ; Sett counter til horisontal lengde.
-bloop2:
-        mov  bl,[esi]                   ; Få en byte fra SI
-        or   bl,bl                    ; Er den 0?
-        je   skip_pixel                 ; OK - Skip den
-        mov  [edi],bl                   ; Nei - Tegn den
-        inc  edi
-        inc  esi
-        dec  ecx                        ; En pixel tegnet...
-        or   ecx,ecx                    ; Er denne linjen ferdig ennå?
-        jne  bloop2                      ; Nei - kjør gjennom igjen...
-        add  edi,edx                    ; Legg til slik at neste linje starter under...
-        dec  eax                        ; Ja - en linje ferdig...
-        or   eax,eax                    ; Er Vertikal teller null enda?
-        jne  bloop1                      ; Nei - kjør loop igjen
-        jmp  bend                        ; Ja - avslutt
-skip_pixel:
-        inc  edi                        ; Hopp over dette koordinatet
-        inc  esi
-        dec  ecx                        ; En pixel "tegnet"..
-        or   ecx,ecx                    ; Er horisontal teller 0?
-        jne  bloop2                      ; Hopp tilbake hvis linje ikke er
-                                        ; ferdig tegnet..
-        add  edi,edx                    ; Legg til slik at neste linje starter under..
-        or   eax,eax                    ; Er vertikal teller 0?
-        dec  eax                        ; En linje mindre..
-        jnz  bloop1                      ; Hvis den ikke er 0, initialiser
-                                        ; teller på nytt.
-bend:
+    "mov     eax,_y" \
+    "mov     ebx,_x" \
+    "mov     edi,0A0000h"             /* Video-mem... */ \
+    "mov     ecx,eax" \
+    "shl     eax,8" \
+    "shl     ecx,6" \
+    "add     eax,ecx"                 /* Legg sammen begge Y-ene */ \
+    "add     eax,ebx"                 /* Legg til X */ \
+    "add     edi,eax"                 /* Ferdig koordinat ligger nå i EDI */ \
+    "mov     edx,320"                 /* Kalkuler mengde som må legges til EDI på */ \
+    "mov     ebx,_xlen"              /* slutten av hver linje. */ \
+    "sub     edx,ebx"                 /* Mengde ligger i EDX */ \
+    "mov     eax,_ylen"              /* Legg vertikal teller i EAX */ \
+"bloop1:" \
+    "mov     ecx,_xlen"              /* Sett counter til horisontal lengde. */ \
+"bloop2:" \
+    "mov  bl,[esi]"                   /* Få en byte fra SI */ \
+    "or   bl,bl"                    /* Er den 0? */ \
+    "je   skip_pixel"                 /* OK - Skip den */ \
+    "mov  [edi],bl"                   /* Nei - Tegn den */ \
+    "inc  edi" \
+    "inc  esi" \
+    "dec  ecx"                        /* En pixel tegnet... */ \
+    "or   ecx,ecx"                    /* Er denne linjen ferdig ennå? */ \
+    "jne  bloop2"                      /* Nei - kjør gjennom igjen... */ \
+    "add  edi,edx"                    /* Legg til slik at neste linje starter under... */ \
+    "dec  eax"                        /* Ja - en linje ferdig... */ \
+    "or   eax,eax"                    /* Er Vertikal teller null enda? */ \
+    "jne  bloop1"                      /* Nei - kjør loop igjen */ \
+    "jmp  bend"                        /* Ja - avslutt */ \
+"skip_pixel:" \
+    "inc  edi"                        /* Hopp over dette koordinatet */ \
+    "inc  esi" \
+    "dec  ecx"                        /* En pixel tegnet.. */ \
+    "or   ecx,ecx"                    /* Er horisontal teller 0? */ \
+    "jne  bloop2"                      /* Hopp tilbake hvis linje ikke er ferdig tegnet */ \
+    "add  edi,edx"                    /* Legg til slik at neste linje starter under.. */ \
+    "or   eax,eax"                    /* Er vertikal teller 0? */ \
+    "dec  eax"                        /* En linje mindre.. */ \
+    "jnz  bloop1"                      /* Hvis den ikke er 0, initialiser teller på nytt. */ \
+"bend:" \
 parm [ebx] [esi] \
 modify [eax ebx ecx edx esi edi];
 
@@ -385,52 +377,159 @@ void bput_sprite(long x, long y, long xlen, long ylen, byte *imgpnt, byte *buffe
     params.y = y;
     params.xlen = xlen;
     params.ylen = ylen;
+    _x = x;
+    _y = y;
+    _xlen = xlen;
+    _ylen = ylen;
     do_bput_sprite(&params, imgpnt, buffer);
 }
 
 #pragma aux do_bput_sprite = \
-mov     eax,[Y]
-        mov     ebx,[X]
-        mov     esi,IMGPNT
+    "mov     eax,_y" \
+    "mov     ebx,_x" \
+    "mov     ecx,eax" \
+    "shl     eax,8" \
+    "shl     ecx,6" \
+    "add     eax,ecx"                 /* Legg sammen begge Y-ene */ \
+    "add     eax,ebx"                 /* Legg til X */ \
+    "add     edi,eax"                 /* Ferdig koordinat ligger nå i EDI */ \
+    "mov     edx,320"                 /* Kalkuler mengde som må legges til EDI på */ \
+    "mov     ebx,_xlen"              /* slutten av hver linje. */ \
+    "sub     edx,ebx"                 /* Mengde ligger i EDX */ \
+    "mov     eax,_ylen"              /* Legg vertikal teller i EAX */ \
+"bbloop1:" \
+    "mov     ecx,_xlen"              /* Sett counter til horisontal lengde.*/ \
+"bbloop2:" \
+    "mov  bl,[esi]"                   /* Få en byte fra SI*/ \
+    "or   bl,bl"                    /* Er den 0?*/ \
+    "je   bskip_pixel"                 /* OK - Skip den*/ \
+    "mov  [edi],bl"                   /* Nei - Tegn den*/ \
+    "inc  edi" \
+    "inc  esi" \
+    "dec  ecx"                        /* En pixel tegnet...*/ \
+    "or   ecx,ecx"                    /* Er denne linjen ferdig ennå?*/ \
+    "jne  bbloop2"                      /* Nei - kjør gjennom igjen...*/ \
+    "add  edi,edx"                    /* Legg til slik at neste linje starter under...*/ \
+    "dec  eax"                        /* Ja - en linje ferdig...*/ \
+    "or   eax,eax"                    /* Er Vertikal teller null enda?*/ \
+    "jne  bbloop1"                      /* Nei - kjør loop igjen*/ \
+    "jmp  bbend"                        /* Ja - avslutt*/ \
+"bskip_pixel:" \
+    "inc  edi"                        /* Hopp over dette koordinatet*/ \
+    "inc  esi" \
+    "dec  ecx"                        /* En pixel "tegnet"..*/ \
+    "or   ecx,ecx"                    /* Er horisontal teller 0?*/ \
+    "jne  bbloop2"                      /* Hopp tilbake hvis linje ikke er ferdig tegnet*/ \
+    "add  edi,edx"                    /* Legg til slik at neste linje starter under..*/ \
+    "or   eax,eax"                    /* Er vertikal teller 0?*/ \
+    "dec  eax"                        /* En linje mindre..*/ \
+    "jnz  bbloop1"                      /* Hvis den ikke er 0, initialiser teller på nytt*/ \
+"bbend:" \
+parm [ebx] [esi] [edi] \
+modify [eax ebx ecx edx esi edi];
 
-        mov     edi,BUF             ; Video-mem...
-        mov     ecx,eax
-        shl     eax,8
-        shl     ecx,6
-        add     eax,ecx                 ; Legg sammen begge Y-ene
-        add     eax,ebx                 ; Legg til X
-        add     edi,eax                 ; Ferdig koordinat ligger nå i EDI
-        mov     edx,320                 ; Kalkuler mengde som må legges til EDI på
-        mov     ebx,[XLEN]              ; slutten av hver linje.
-        sub     edx,ebx                 ; Mengde ligger i EDX
-        mov     eax,[YLEN]              ; Legg vertikal teller i EAX
-bbloop1:
-        mov     ecx,[XLEN]              ; Sett counter til horisontal lengde.
-bbloop2:
-        mov  bl,[esi]                   ; Få en byte fra SI
-        or   bl,bl                    ; Er den 0?
-        je   bskip_pixel                 ; OK - Skip den
-        mov  [edi],bl                   ; Nei - Tegn den
-        inc  edi
-        inc  esi
-        dec  ecx                        ; En pixel tegnet...
-        or   ecx,ecx                    ; Er denne linjen ferdig ennå?
-        jne  bbloop2                      ; Nei - kjør gjennom igjen...
-        add  edi,edx                    ; Legg til slik at neste linje starter under...
-        dec  eax                        ; Ja - en linje ferdig...
-        or   eax,eax                    ; Er Vertikal teller null enda?
-        jne  bbloop1                      ; Nei - kjør loop igjen
-        jmp  bbend                        ; Ja - avslutt
-bskip_pixel:
-        inc  edi                        ; Hopp over dette koordinatet
-        inc  esi
-        dec  ecx                        ; En pixel "tegnet"..
-        or   ecx,ecx                    ; Er horisontal teller 0?
-        jne  bbloop2                      ; Hopp tilbake hvis linje ikke er
-                                        ; ferdig tegnet..
-        add  edi,edx                    ; Legg til slik at neste linje starter under..
-        or   eax,eax                    ; Er vertikal teller 0?
-        dec  eax                        ; En linje mindre..
-        jnz  bbloop1                      ; Hvis den ikke er 0, initialiser
-                                        ; teller på nytt.
-bbend:
+struct BlockCopyParams {
+    long srcx;
+    long srcy;
+    long srcxlen;
+    long srcylen;
+    long dstx;
+    long dsty;
+};
+
+void block_copy(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, int destx, int desty)
+{
+    BlockCopyParams params;
+    params.srcx = srcx;
+    params.srcy = srcy;
+    params.srcxlen = srcxlen;
+    params.srcylen = srcylen;
+    params.dstx = destx;
+    params.dsty = desty;
+    _srcx = srcx;
+    _srcy = srcy;
+    _srcxlen = srcxlen;
+    _srcylen = srcylen;
+    _dstx = destx;
+    _dsty = desty;
+    do_block_copy(&params, buffer);
+}
+
+#pragma aux do_block_copy = \
+    "mov    ecx,_srcy" \
+    "shl    ecx,6" \
+    "mov    eax,_srcy" \
+    "shl    eax,8" \
+    "add    eax,ecx" \
+    "add    eax,_srcx" \
+    "add    esi,eax" \
+    "mov    eax,_dsty" \
+    "mov    edi,0A0000h"         /* Video-minne... */ \
+    "mov    ecx,eax" \
+    "shl    eax,8" \
+    "shl    ecx,6" \
+    "add    eax,ecx"             /* Legg sammen begge Y-ene */ \
+    "add    eax,_dstx"         /* Legg til X */ \
+    "add    edi,eax"             /* Ferdig koordinat ligger nå i EDI */ \
+    "mov    edx,320"             /* Kalkuler mengde som må legges til hver av skjermene ved linjeskift */ \
+    "mov    ebx,_srcxlen"       /* slutten av hver linje. */ \
+    "sub    edx,ebx"             /* Mengde ligger i EDX */ \
+    "mov    eax,_srcylen"       /* Legg vertikal teller i EAX */ \
+"next_line:" \
+    "mov    ecx,ebx"             /* Legg linje-teller i ECX */ \
+    "rep    movsb"               /* Tegn opp en linje.. */ \
+    "add    esi, edx"            /* Legg til 'linjeskift' på buffer */ \
+    "dec    eax"                 /* En linje mindre.. */ \
+    "add    edi,edx"             /* Legg til 'linjeskift' på skjerm */ \
+    "or     eax,eax"             /* Vertikal teller 0 ennå? */ \
+    "jnz    next_line"          /* Nei - gå til neste linje */ \
+parm [ebx] [esi] \
+modify [eax ebx ecx edx esi edi];
+
+void block_copy_b(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, int destx, int desty, byte *destimg)
+{
+    BlockCopyParams params;
+    params.srcx = srcx;
+    params.srcy = srcy;
+    params.srcxlen = srcxlen;
+    params.srcylen = srcylen;
+    params.dstx = destx;
+    params.dsty = desty;
+    _srcx = srcx;
+    _srcy = srcy;
+    _srcxlen = srcxlen;
+    _srcylen = srcylen;
+    _dstx = destx;
+    _dsty = desty;
+    do_block_copy_b(&params, buffer);
+}
+
+#pragma aux do_block_copy_b = \
+    "mov     ecx,_srcy" \
+    "shl     ecx,6" \
+    "mov     eax,_srcy" \
+    "shl     eax,8" \
+    "add     eax,ecx" \
+    "add     eax,_srcx" \
+    "add     esi,eax" \
+    "mov     eax,_dsty"           /* Kalkuler koordinater for skjerm-minne */ \
+    "mov     ecx,eax" \
+    "shl     eax,8" \
+    "shl     ecx,6" \
+    "add     eax,ecx"             /* Legg sammen begge Y-ene */ \
+    "add     eax,_dstx"         /* Legg til X */ \
+    "add     edi,eax"             /* Ferdig koordinat ligger nå i EDI */ \
+    "mov     edx,320"             /* Kalkuler mengde som må legges til hver av skjermene ved linjeskift */ \
+    "mov     ebx,_srcxlen"       /* slutten av hver linje. */ \
+    "sub     edx,ebx"             /* Mengde ligger i EDX */ \
+    "mov     eax,_srcylen"       /* Legg vertikal teller i EAX */ \
+"next_line:" \
+    "mov     ecx,ebx"             /* Legg linje-teller i ECX */ \
+    "rep     movsb"               /* Tegn opp en linje.. */ \
+    "add     esi, edx"            /* Legg til 'linjeskift' på buffer */ \
+    "dec     eax"                 /* En linje mindre.. */ \
+    "add     edi,edx"             /* Legg til 'linjeskift' på skjerm */ \
+    "or      eax,eax"             /* Vertikal teller 0 ennå? */ \
+    "jnz     next_line"          /* Nei - gå til neste linje */ \
+parm [ebx] [esi] [edi] \
+modify [eax ebx ecx edx esi edi];
