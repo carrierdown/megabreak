@@ -1,7 +1,8 @@
 /*
     MegaBreak v 1.0
+    By Knut A. Ruud
 
-    (C) 1995/96/97 Knut A. Ruud
+    (C) 1995/96/97 riot Entertainment
 */
 
 #include <conio.h>
@@ -73,7 +74,7 @@ const short BALLWIDTH = 4;
 const short BALLHEIGHT = 4;
 const short PADWIDTH = 26;
 const short PAD_Y   = 190;
-const short YLIMIT = 195;   /* Hvis ballen gÃ¥r under dette Y-koordinat
+const short YLIMIT = 195;   /* Hvis ballen g†r under dette Y-koordinat
                                mister man et liv */
 
 const short ICON_COORDS[4] = { 234, 254, 274, 294 };
@@ -96,7 +97,7 @@ const short SHUT_DOWN = 3;
 const short ENHANCE__COUNT = 20;
 const short FLASHDELAY = 5; // Hvor mange spill-cycles skal en flash vare?
 const short BULLET_SPEED = 5;
-short SHOT__DELAY = 20;  // Ikke const fordi den skal kunne forandres for Ã¥
+short SHOT__DELAY = 20;  // Ikke const fordi den skal kunne forandres for †
                         // lage auto-fire.
 short NUM_LIVES = 3;
 
@@ -140,7 +141,7 @@ const short HISCORES = 3;
 
 short sel_offsets[3] = {0, 40, 10};
 
-// Hvor mye tid skal man ha pÃ¥ hvert brett?
+// Hvor mye tid skal man ha p† hvert brett?
 short level_times[42] = {50, 45, 55, 60, 60, 70, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 90, 85, 90, 80, 90, 90, 90, 90, 90, 90, 90, 95, 100, 100, 105, 105, 110, 115, 120, 0, 0};
 
 short GAMEOVER = FALSE;
@@ -158,21 +159,21 @@ byte *select;
 struct find_t fileinfo;
 
 short BrickCoords[2][4];    // Array over X og Y koords til brikk. rundt ball
-short BrickTable[4];        // Holder styr pÃ¥ hvilke brikker som eksisterer
+short BrickTable[4];        // Holder styr p† hvilke brikker som eksisterer
 short BrickCount = 0;       // Antall brikker som er igjen
 short BallX[4], BallY[4];   // Holder koordinatene til ball-hotspots
 short GridX[4], GridY[4];   // Holder grid-koordinater til ball-hotspots
 double padX;
 short x, y, i;                    // Telle-variabel
-short key;                  // Til Ã¥ ta imot fra keyboard
+short key;                  // Til † ta imot fra keyboard
 short pause;                // Variabel som sier om hver spill-cycle
                             // skal pauses eller ikke
 double speed = 2.0;               // Forteller ballens fart
 
 long score = 0;             // Holder spillerens score
 long oldscore = 0;
-short next_level = FALSE;   // Forteller om neste brett er nÃ¥dd
-short level = 0;            // Holder styr pÃ¥ hvilken level som er aktiv
+short next_level = FALSE;   // Forteller om neste brett er n†dd
+short level = 0;            // Holder styr p† hvilken level som er aktiv
 short oldlev = -1;
 short ball_launched;        // Forteller om ballen er startet
 short brickflash = FALSE;   // Forteller om destroy_brick() har truffet
@@ -243,9 +244,9 @@ byte *bgscreen;
 byte *bigfont[50];
 byte *smallfont[50];
 
-byte *batshoot;         // NÃ¥r bat skyter
+byte *batshoot;         // N†r bat skyter
 byte *bullet;            // Kule
-byte *messages[10];      // Beskjeder pÃ¥ mini-panelet
+byte *messages[10];      // Beskjeder p† mini-panelet
 byte *bats[9];
 byte *mainscreen;
 signed char palette[768];
@@ -325,9 +326,9 @@ int main(int argc, char *argv[])
     auto struct tm newtime;
 
     short i2;               // extra telle-variabel
-    short checked=0;      // variabel til bruk nÃ¥r det er mange if's etter
+    short checked=0;      // variabel til bruk n†r det er mange if's etter
 			// hverandre, og man skal "si fra" om noe er testet
-			// fra fÃ¸r.
+			// fra f›r.
     short brick;
 
     /*
@@ -367,8 +368,8 @@ int main(int argc, char *argv[])
     init_shot_list();
     mode_13h();
     set_pal(palette);           // Setter hoved-palettet
-    set_mouse_sens(sensitivity,16);      // Mindre sensitivitet pÃ¥ musa
-    limit_mouse(6,190,398,190); // Bat'en kan bare gÃ¥ pÃ¥ liten del av skjermen
+    set_mouse_sens(sensitivity,16);      // Mindre sensitivitet p† musa
+    limit_mouse(6,190,398,190); // Bat'en kan bare g† p† liten del av skjermen
 
     put_block(0,0,320,200,mainscreen);     // tegn hoved-skjerm
 
@@ -460,7 +461,7 @@ int main(int argc, char *argv[])
     rekyl_active = FALSE;
 
     bat_type = 0;
-    Ball.xinc = 0;  // Ballen starter stillestÃ¥ende
+    Ball.xinc = 0;  // Ballen starter stillest†ende
     Ball.yinc = 0;
     ball_offset = 11;
     bat_type = 0;
@@ -469,10 +470,10 @@ int main(int argc, char *argv[])
 		** HOVED-LOOP **
 	*/
 
-	while (alive == TRUE) // Hopp ut nÃ¥r man misser
+	while (alive == TRUE) // Hopp ut n†r man misser
 	{
 
-	// ** Putt sprites pÃ¥ skjermen
+	// ** Putt sprites p† skjermen
 
     if ((!autobat) && (!pause)) {
         get_mouse_status();     // Oppdater X og Y koordinater og sjekk knapper
@@ -493,10 +494,10 @@ int main(int argc, char *argv[])
         }
     }
 
-    // GÃ¥ gjennom liste av flash'es
+    // G† gjennom liste av flash'es
 
-    reader = list_h;            // GÃ¥ til begynnelsen av lista..
-    reader = reader -> next;    // Hopp over fÃ¸rste node
+    reader = list_h;            // G† til begynnelsen av lista..
+    reader = reader -> next;    // Hopp over f›rste node
     while (reader) {            // Hvis denne noden er noe..
 
         if (reader -> delay == FLASHDELAY)  // Flash er ikke tegnet hvis delay er maks
@@ -509,9 +510,9 @@ int main(int argc, char *argv[])
         if (reader -> delay == 0) { // Delay er 0 og skal derfor slettes...
 
             if (reader -> next == NULL) { // er dette siste element?
-                list_t = list_t -> prev; // GÃ¥ tilbake
+                list_t = list_t -> prev; // G† tilbake
                 flash = reader;
-                reader = list_t;    // leser er pÃ¥ slutten
+                reader = list_t;    // leser er p† slutten
                 reader -> next = NULL;  // Ingen noder etter sluttpunkt
 
                 brick = brickmap[level][(flash->gridY-1)*13+(flash->gridX-1)];
@@ -523,10 +524,10 @@ int main(int argc, char *argv[])
             else {
                 prevnode = reader -> prev;    // prevnode settes lik forrige node
                 prevnode -> next = reader -> next;    /* prevnode peker
-                                                         pÃ¥ node etter reader */
+                                                         p† node etter reader */
                 flash = reader;
                 reader = reader -> next;    // reader hopper videre
-                reader -> prev = prevnode;  /* og peker tilbake pÃ¥ sitt nye
+                reader -> prev = prevnode;  /* og peker tilbake p† sitt nye
                                                bakelement */
 
                 brick = brickmap[level][(flash->gridY-1)*13+(flash->gridX-1)];
@@ -536,7 +537,7 @@ int main(int argc, char *argv[])
             }
         } // IF node skal slettes
 
-        reader = reader -> next;    // GÃ¥ til neste node
+        reader = reader -> next;    // G† til neste node
 
     } // WHILE
 
@@ -554,7 +555,7 @@ int main(int argc, char *argv[])
 		    case 1:                 // VENSTRE MUSEKNAPP
 			Ball.xinc = -speed;
 			break;
-		    case 2:                 // HÂ¥YRE MUSEKNAPP
+		    case 2:                 // HYRE MUSEKNAPP
 			Ball.xinc = speed;
 		    }
 		Ball.yinc = -speed;
@@ -579,21 +580,21 @@ int main(int argc, char *argv[])
     if (rekyl_active)
         put_sprite(padX,(PAD_Y+1),26,5,batshoot);
     else
-        put_sprite(padX,PAD_Y,26,5,bats[bat_type]);  // Putt BAT pÃ¥ skjermen
+        put_sprite(padX,PAD_Y,26,5,bats[bat_type]);  // Putt BAT p† skjermen
 
     if ((!balltype) && strongball_active)
-        put_sprite(Ball.X, Ball.Y, 4, 4, balls[8+strong_state]); // Putt BALL pÃ¥ skjermen
+        put_sprite(Ball.X, Ball.Y, 4, 4, balls[8+strong_state]); // Putt BALL p† skjermen
     else
-        put_sprite(Ball.X, Ball.Y, 4, 4, balls[balltype]); // Putt BALL pÃ¥ skjermen
+        put_sprite(Ball.X, Ball.Y, 4, 4, balls[balltype]); // Putt BALL p† skjermen
 
     // *************************************************************
 	// ******************* COLLISION DETECTION *********************
 	// *************************************************************
 
-	// Ball mÃ¥ sjekkes for hver direksjon den gÃ¥r i.
-	// Det den fÃ¸rste rutinen gjÃ¸r er Ã¥ finne ut hvilken retning ballen
-	// gÃ¥r i, og deretter lage en passende for-lÃ¸kke. Innholdet
-	// i hver av disse for-lÃ¸kkene vil vÃ¦re litt forskjellige. Det
+	// Ball m† sjekkes for hver direksjon den g†r i.
+	// Det den f›rste rutinen gj›r er † finne ut hvilken retning ballen
+	// g†r i, og deretter lage en passende for-l›kke. Innholdet
+	// i hver av disse for-l›kkene vil v‘re litt forskjellige. Det
 	// er mulig at jeg lager dem som fire funksjoner, slik at hoved-
 	// koden blir mer oversiktilig.
 
@@ -613,13 +614,13 @@ int main(int argc, char *argv[])
 		    calc_gridcoords();
 		    find_actuabricks();
 
-		    // Finn ut hvilken vei ballen skal gÃ¥, ved Ã¥ se pÃ¥ hvilke
+		    // Finn ut hvilken vei ballen skal g†, ved † se p† hvilke
 		    // brikker som er aktive i BrickTable, og hvor
 
 		    // Kant-tilfelle
 		    if (BrickTable[0] == 1 && BrickTable[1] == 0
 			&& BrickTable[2] == 0 && BrickTable[3] == 0) {
-			// Sjekk om ballen treffer akkurat pÃ¥ kanten av
+			// Sjekk om ballen treffer akkurat p† kanten av
 			// brikken
 			    Ball.xinc = Ball.xinc * -1;
 			    Ball.yinc = Ball.yinc * -1;
@@ -627,7 +628,7 @@ int main(int argc, char *argv[])
 			    goto endcheck;
 		    }
 
-		    // HjÃ¸rne-tilfelle
+		    // Hj›rne-tilfelle
 		    if (BrickTable[0] == 1 && BrickTable[1] == 1 &&
 			BrickTable[2] == 1 && BrickTable[3] == 0) {
 
@@ -652,7 +653,7 @@ int main(int argc, char *argv[])
 			goto endcheck;
 		    }
 
-		    // Sjekk "smÃ¥"-tilfeller
+		    // Sjekk "sm†"-tilfeller
 		    if (BrickTable[2] == 1) {
 			Ball.xinc = Ball.xinc * -1;
 			destroy_brick(2);
@@ -665,13 +666,13 @@ int main(int argc, char *argv[])
 		    }
 
 		    endcheck:
-		    checked=1; //midlertidig
+		    checked=1; //imidlertidig
 
-		} // IF - Er ballen innenfor omrÃ¥det?
+		} // IF - Er ballen innenfor omr†det?
 
 	} // IF - Nordvestlig retning
 
-	// *** NordÃ¸stlig retning ***
+	// *** Nord›stlig retning ***
 
 	if ((Ball.xinc > 0) && (Ball.yinc < 0))
 	{
@@ -687,13 +688,13 @@ int main(int argc, char *argv[])
 		    calc_gridcoords();
 		    find_actuabricks();
 
-		    // Finn ut hvilken vei ballen skal gÃ¥, ved Ã¥ se pÃ¥ hvilke
+		    // Finn ut hvilken vei ballen skal g†, ved † se p† hvilke
 		    // brikker som er aktive i BrickTable, og hvor
 
 		    // Kant-tilfelle
 		    if (BrickTable[0] == 0 && BrickTable[1] == 1
 			&& BrickTable[2] == 0 && BrickTable[3] == 0) {
-			// Sjekk om ballen treffer akkurat pÃ¥ kanten av
+			// Sjekk om ballen treffer akkurat p† kanten av
 			// brikken
 			    Ball.xinc = Ball.xinc * -1;
 			    Ball.yinc = Ball.yinc * -1;
@@ -701,7 +702,7 @@ int main(int argc, char *argv[])
 			    goto endcheck2;
 		    }
 
-		    // HjÃ¸rne-tilfelle
+		    // Hj›rne-tilfelle
 		    if (BrickTable[0] == 1 && BrickTable[1] == 1 &&
 			BrickTable[2] == 0 && BrickTable[3] == 1) {
 
@@ -726,7 +727,7 @@ int main(int argc, char *argv[])
 			goto endcheck2;
 		    }
 
-		    // Sjekk "smÃ¥"-tilfeller
+		    // Sjekk "sm†"-tilfeller
 		    if (BrickTable[3] == 1) {
 			Ball.xinc = Ball.xinc * -1;
 			destroy_brick(3);
@@ -739,20 +740,20 @@ int main(int argc, char *argv[])
 		    }
 
 		    endcheck2:
-		    checked=1; //midlertidig
+		    checked=1; //imidlertidig
 
-		} // IF - Er ballen innenfor omrÃ¥det?
+		} // IF - Er ballen innenfor omr†det?
 
-	} // IF - NordÃ¸stlig retning
+	} // IF - Nord›stlig retning
 
-	// *** SÃ¸rvestlig retning ***
+	// *** S›rvestlig retning ***
 
 	if (Ball.xinc < 0 && Ball.yinc > 0)
 	{
         i = (Ball.X + Ball.xinc) - (int)Ball.X;
 
-		find_easthotspots();    // Bruker motsatt proc. nÃ¥r ballen
-					// gÃ¥r sÃ¸rover
+		find_easthotspots();    // Bruker motsatt proc. n†r ballen
+					// g†r s›rover
 
         if ((BallY[3] <= 151) && (BallY[0] >= 12)
 		    && (BallX[0] > 4) && (BallX[3] < 224))
@@ -762,13 +763,13 @@ int main(int argc, char *argv[])
 		    calc_gridcoords();
 		    find_actuabricks();
 
-		    // Finn ut hvilken vei ballen skal gÃ¥, ved Ã¥ se pÃ¥ hvilke
+		    // Finn ut hvilken vei ballen skal g†, ved † se p† hvilke
 		    // brikker som er aktive i BrickTable, og hvor
 
 		    // Kant-tilfelle
 		    if (BrickTable[0] == 0 && BrickTable[1] == 0
 			&& BrickTable[2] == 1 && BrickTable[3] == 0) {
-			// Sjekk om ballen treffer akkurat pÃ¥ kanten av
+			// Sjekk om ballen treffer akkurat p† kanten av
 			// brikken
 			    Ball.xinc = Ball.xinc * -1;
 			    Ball.yinc = Ball.yinc * -1;
@@ -776,7 +777,7 @@ int main(int argc, char *argv[])
 			    goto endcheck3;
 		    }
 
-		    // HjÃ¸rne-tilfelle
+		    // Hj›rne-tilfelle
 		    if (BrickTable[0] == 1 && BrickTable[1] == 0 &&
 			BrickTable[2] == 1 && BrickTable[3] == 1) {
 
@@ -801,7 +802,7 @@ int main(int argc, char *argv[])
 			goto endcheck3;
 		    }
 
-		    // Sjekk "smÃ¥"-tilfeller
+		    // Sjekk "sm†"-tilfeller
 		    if (BrickTable[0] == 1) {
 			Ball.xinc = Ball.xinc * -1;
 			destroy_brick(0);
@@ -814,19 +815,19 @@ int main(int argc, char *argv[])
 		    }
 		    
 		    endcheck3:
-		    checked=1; //midlertidig
+		    checked=1; //imidlertidig
 
-		} // IF - Er ballen innenfor omrÃ¥det?
+		} // IF - Er ballen innenfor omr†det?
 
-	} // IF - SÃ¸rvestlig retning
+	} // IF - S›rvestlig retning
 
-	// *** SÃ¸rÃ¸stlig retning ***
+	// *** S›r›stlig retning ***
 
 	if ((Ball.xinc > 0) && (Ball.yinc > 0))
 	{
         i = (Ball.X + Ball.xinc) - (int)Ball.X;
 
-		find_westhotspots();    // Motsatt proc. nÃ¥r ball gÃ¥r sÃ¸rover
+		find_westhotspots();    // Motsatt proc. n†r ball g†r s›rover
 
         if ((BallY[3] <= 151) && (BallY[0] >= 12)
 		    && (BallX[0] > 4) && (BallX[3] < 224))
@@ -836,13 +837,13 @@ int main(int argc, char *argv[])
 		    calc_gridcoords();
 		    find_actuabricks();
 
-		    // Finn ut hvilken vei ballen skal gÃ¥, ved Ã¥ se pÃ¥ hvilke
+		    // Finn ut hvilken vei ballen skal g†, ved † se p† hvilke
 		    // brikker som er aktive i BrickTable, og hvor
 
 		    // Kant-tilfelle
 		    if (BrickTable[0] == 0 && BrickTable[1] == 0
 			&& BrickTable[2] == 0 && BrickTable[3] == 1) {
-			// Sjekk om ballen treffer akkurat pÃ¥ kanten av
+			// Sjekk om ballen treffer akkurat p† kanten av
 			// brikken
 			    Ball.xinc = Ball.xinc * -1;
 			    Ball.yinc = Ball.yinc * -1;
@@ -850,7 +851,7 @@ int main(int argc, char *argv[])
 			    goto endcheck4;
 		    }
 
-		    // HjÃ¸rne-tilfelle
+		    // Hj›rne-tilfelle
 		    if (BrickTable[0] == 0 && BrickTable[1] == 1 &&
 			BrickTable[2] == 1 && BrickTable[3] == 1) {
 
@@ -875,7 +876,7 @@ int main(int argc, char *argv[])
 			goto endcheck4;
 		    }
 
-		    // Sjekk "smÃ¥"-tilfeller
+		    // Sjekk "sm†"-tilfeller
 		    if (BrickTable[1] == 1) {
 			Ball.xinc = Ball.xinc * -1;
 			destroy_brick(1);
@@ -888,11 +889,11 @@ int main(int argc, char *argv[])
 		    }
 		    
 		    endcheck4:
-		    checked=1; //midlertidig
+		    checked=1; //imidlertidig
 
-		} // IF - Er ballen innenfor omrÃ¥det?
+		} // IF - Er ballen innenfor omr†det?
 
-	} // IF - SÃ¸rÃ¸stlig retning
+	} // IF - S›r›stlig retning
 
 	check_pad();
 	check_walls();
@@ -1156,14 +1157,14 @@ int main(int argc, char *argv[])
 
     // Sjekk etter nye avfyringer
     if (shoot_active && shot_delay == 0) {
-        if (BUTTON_STATE == 1) { // Venstre museknapp for Ã¥ skyte
-            // Legg til et nytt skudd pÃ¥ shot-lista
+        if (BUTTON_STATE == 1) { // Venstre museknapp for † skyte
+            // Legg til et nytt skudd p† shot-lista
             Shot = new shot;
             sprevnode = slist_t -> prev;
             slist_t -> prev = Shot;      // Ny node bak list_t
             Shot -> next = slist_t;      // node peker til list_t
-            Shot -> prev = sprevnode;    // node peker tilbake pÃ¥ forrige node
-            sprevnode -> next = Shot;    // forrige node peker pÃ¥ nye
+            Shot -> prev = sprevnode;    // node peker tilbake p† forrige node
+            sprevnode -> next = Shot;    // forrige node peker p† nye
 
             Shot -> X = padX+12;
             Shot -> Y = PAD_Y - speed;
@@ -1181,7 +1182,7 @@ int main(int argc, char *argv[])
             rekyl_active = FALSE;
     }
 
-    // GÃ¥ gjennom liste av shots
+    // G† gjennom liste av shots
     sreader = slist_h -> next;
 
     while (sreader -> next) {
@@ -1207,7 +1208,7 @@ int main(int argc, char *argv[])
                 delete Shot;
             }
             else {
-                Shot -> X += 1; // Sjekk andre halvpart av kulen oxÃ¥..
+                Shot -> X += 1; // Sjekk andre halvpart av kulen ox†..
 
                 Shot -> gridX = ((Shot -> X-4)/17)+1;
                 Shot -> gridY = ((Shot -> Y-12)/7)+1;
@@ -1401,7 +1402,7 @@ int main(int argc, char *argv[])
 
 	// ** Slett sprites **
 
-    wait_vbl();                                 // Vent pÃ¥ VBL
+    wait_vbl();                                 // Vent p† VBL
 
     block_copy(padX,PAD_Y,26,(5+shoot_active),bgscreen, padX, PAD_Y);           // Slett BAT
     block_copy(Ball.X, Ball.Y, 4, 4, bgscreen, Ball.X, Ball.Y);       // Slett BALL
@@ -1442,7 +1443,7 @@ int main(int argc, char *argv[])
     if (lives == 0)
         GAMEOVER = TRUE;
 
-    }
+    } // while - lives > 0
 
     end:
 
@@ -1519,7 +1520,7 @@ void bdraw_bricks()
     }
 }
 
-// Finner hotspots nÃ¥r ballen gÃ¥r mot vest
+// Finner hotspots n†r ballen g†r mot vest
 
 void find_westhotspots()
 {
@@ -1534,7 +1535,7 @@ void find_westhotspots()
     BallY[3] = BallY[2];
 }
 
-// Finner hotspots nÃ¥r ballen gÃ¥r mot Ã¸st
+// Finner hotspots n†r ballen g†r mot ›st
 
 void find_easthotspots()
 {
@@ -1614,7 +1615,7 @@ void handle_doublebricks(short brick1, short brick2, short dim)
 /*
     Denne funksjonen fjerner en brikke
 
-    Funksjonen hÃ¥ndterer nÃ¥ impassable bricks, og impassable from below og
+    Funksjonen h†ndterer n† impassable bricks, og impassable from below og
     above - bricks.
 */
 
@@ -1659,11 +1660,11 @@ void destroy_brick(short bricknum)
         flash -> screenY = BrickCoords[Y][bricknum];
         flash -> delay = 5;
         flash -> flashtype = brick - 8;
-        list_t -> next = flash;  // Sett gammel node til Ã¥ peke pÃ¥ nye
+        list_t -> next = flash;  // Sett gammel node til † peke p† nye
         prevnode = list_t;      // Lagre gammel node i prevnode
         list_t = flash;          // Sett tail til nye node
-        list_t -> prev = prevnode; // tail peker tilbake pÃ¥ gammel
-        list_t -> next = NULL;  // Sett nye node til Ã¥ ikke peke pÃ¥ noe
+        list_t -> prev = prevnode; // tail peker tilbake p† gammel
+        list_t -> next = NULL;  // Sett nye node til † ikke peke p† noe
 
         flash -> gridX = GridX[bricknum];
         flash -> gridY = GridY[bricknum];
@@ -1771,11 +1772,11 @@ void shot_destroy_brick(short gridx, short gridy, short x, short y)
         flash -> screenY = y;
         flash -> delay = 5;
         flash -> flashtype = brick - 8;
-        list_t -> next = flash;  // Sett gammel node til Ã¥ peke pÃ¥ nye
+        list_t -> next = flash;  // Sett gammel node til † peke p† nye
         prevnode = list_t;      // Lagre gammel node i prevnode
         list_t = flash;          // Sett tail til nye node
-        list_t -> prev = prevnode; // tail peker tilbake pÃ¥ gammel
-        list_t -> next = NULL;  // Sett nye node til Ã¥ ikke peke pÃ¥ noe
+        list_t -> prev = prevnode; // tail peker tilbake p† gammel
+        list_t -> next = NULL;  // Sett nye node til † ikke peke p† noe
 
         flash -> gridX = gridx;
         flash -> gridY = gridy;
@@ -1819,19 +1820,19 @@ void check_pad()
                 Ball.xinc = -(speed+1);
             }
 
-            // Sjekk hÃ¸yre indre del
+            // Sjekk h›yre indre del
             if (Ball.X >= padX+13) {
                 Ball.xinc = speed;
             }
 
-            // Sjekk hÃ¸yre ytre del
+            // Sjekk h›yre ytre del
             if (Ball.X >= padX+21) {
                 Ball.xinc = (speed+1);
             }
 
-            // FÃ¥ ballen til Ã¥ gÃ¥ oppover igjen
+            // F† ballen til † g† oppover igjen
             Ball.yinc = -speed;
-            // Ballen vil vÃ¦re normal igjen etter en evt. bonus
+            // Ballen vil v‘re normal igjen etter en evt. bonus
             balltype = 0;
             // Sjekk etter 'hidden' power-ups
             if (BONUSLETTER)
@@ -1850,11 +1851,11 @@ void check_walls()
 {
     // sjekk venstre-vegg
     if (Ball.X+Ball.xinc <= 3) {
-	// Sett ballen til Ã¥ gÃ¥ i motsatt retning
+	// Sett ballen til † g† i motsatt retning
 	Ball.xinc = speed;
     }
 
-    // sjekk hÃ¸yre-vegg
+    // sjekk h›yre-vegg
     if (Ball.X+BALLWIDTH+Ball.xinc >= 224) {
 	Ball.xinc = -speed;
     }
@@ -1871,8 +1872,8 @@ void init_list()
 
     flash = new Flash;
     flash -> screenX = 0;    // Viser at noden ikke er i bruk
-    list_h = flash;          // Header peker pÃ¥ fÃ¸rste node
-    list_t = flash;          // Tail peker pÃ¥ siste (og fÃ¸rste) node
+    list_h = flash;          // Header peker p† f›rste node
+    list_t = flash;          // Tail peker p† siste (og f›rste) node
     list_t -> next = NULL;  // Node har ingen node foran seg
     list_t -> prev = NULL;  // Node har ingen node etter seg
 }
@@ -2278,7 +2279,7 @@ void init_shot_list()
 
 void delete_shot_list()
 {
-    // Skudd-listen mÃ¥ slettes mellom hver level
+    // Skudd-listen m† slettes mellom hver level
     sreader = slist_h -> next;
 
     while (sreader -> next) {
@@ -2296,7 +2297,7 @@ void delete_shot_list()
 
 void init_hiscores()
 {
-    // FÃ¸rste gang skal vi legge inn en default hiscore liste
+    // F›rste gang skal vi legge inn en default hiscore liste
     strcpy(hiscore_table[0].name, "MEGABREAK");
     hiscore_table[0].level = 40;
     hiscore_table[0].score = 500000;
@@ -2335,7 +2336,7 @@ void update_hiscores()
 {
     short i, oldi, ii;
 
-    // Finn ut hvor den nye score skal legges pÃ¥ lista
+    // Finn ut hvor den nye score skal legges p† lista
     for (i=0; i<10; i++) {
         if (new_entry.score > hiscore_table[i].score) {
             oldi = i;
@@ -2474,7 +2475,6 @@ void startup()
 
 void read_config()
 {
-    int ii;
     FILE *handle;
 
     handle = fopen("gfx.dat", "r+b");
@@ -2485,14 +2485,14 @@ void read_config()
     speed = getc(handle);
     sensitivity = getc(handle);
 
-    // GjÃ¸r om speed variabel
+    // Gj›r om speed variabel
     if (speed == 2)
         speed = 1.5;
     else if (speed == 3)
         speed = 2.0;
 
     for (int t=0; t<10; t++) {
-        for (ii=0; ii<9; ii++)
+        for (int ii=0; ii<9; ii++)
             hiscore_table[t].name[ii] = getc(handle);
         hiscore_table[t].level = getc(handle);
 
@@ -2503,7 +2503,7 @@ void read_config()
 
         hiscore_table[t].score = 0;
 
-        for (ii=(num_sifre-1); ii>=0; ii--) {
+        for (int ii=(num_sifre-1); ii>=0; ii--) {
             nummer = getc(handle);
             hiscore_table[t].score += exp(10, ii) * nummer;
         }
@@ -2523,13 +2523,13 @@ void write_config()
 
     fseek(handle, 44107, SEEK_SET);
 
-    // GjÃ¸r om speed variabel    ( 1 - 3 )
+    // Gj›r om speed variabel    ( 1 - 3 )
     if (speed == 1.5)
         speed = 2;
     else if (speed == 2.0)
         speed = 3;
 
-    // Skriv settings fÃ¸rst
+    // Skriv settings f›rst
     putc((char)NUM_LIVES, handle);
     putc((char)speed, handle);
     putc((char)sensitivity, handle);
@@ -2615,29 +2615,29 @@ void show_end_screen()
 void init_end_screen()
 {
      startup_text = " MegaBreak startup v 1.1                                                        \0";
-     end_text[ 0] = "â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”\0";
-     end_text[ 1] = "â”‚ MegaBreak v 1.1                        copyright (c) 1998  Knut Andreas Ruud â”‚\0";
-     end_text[ 2] = "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤\0";
-     end_text[ 3] = "â”‚ Credits                                                                      â”‚\0";
-     end_text[ 4] = "â”‚                                                                              â”‚\0";
-     end_text[ 5] = "â”‚     Coding/Graphics & Level Design by Knut A. Ruud                           â”‚\0";
-     end_text[ 6] = "â”‚     Betatesting/Playtesting by Tommy Berg Kristoffersen                      â”‚\0";
-     end_text[ 7] = "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤\0";
-     end_text[ 8] = "â”‚ I hope you enjoyed playing MegaBreak. Whatever you think of it, I would      â”‚\0";
-     end_text[ 9] = "â”‚ really appreciate it if you could e-mail me some comments, suggestions or    â”‚\0";
-     end_text[10] = "â”‚ whatever.                                                                    â”‚\0";
-     end_text[11] = "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤\0";
-     end_text[12] = "â”‚ Don't forget that you can make your â”‚ MegaBreak on the net! You are welcome  â”‚\0";
-     end_text[13] = "â”‚ own levels for MegaBreak using the  â”‚ to check out my MegaBreak page. As     â”‚\0";
-     end_text[14] = "â”‚ supplied Level Editor. Check out    â”‚ well as some history and general info  â”‚\0";
-     end_text[15] = "â”‚ manual.txt for details.             â”‚ you will be able to find extra levels  â”‚\0";
-     end_text[16] = "â”‚                                     â”‚ here in the future. (That is, if       â”‚\0";
-     end_text[17] = "â”‚                                     â”‚ anyone makes some cool levels)         â”‚\0";
-     end_text[18] = "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤\0";
-     end_text[19] = "â”‚ Ã…Wanna create an official extra-levels pack for MegaBreak?   Contact me!     â”‚\0";
-     end_text[20] = "â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤\0";
-     end_text[21] = "â”‚ MegaBreak Homepage: http://www.sn.no/~oruud/       E-mail: oeyruud@online.no â”‚\0";
-     end_text[22] = "â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜\0";
+     end_text[ 0] = "ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿\0";
+     end_text[ 1] = "³ MegaBreak v 1.1                        copyright (c) 1998  Knut Andreas Ruud ³\0";
+     end_text[ 2] = "ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´\0";
+     end_text[ 3] = "³ Credits                                                                      ³\0";
+     end_text[ 4] = "³                                                                              ³\0";
+     end_text[ 5] = "³     Coding/Graphics & Level Design by Knut A. Ruud                           ³\0";
+     end_text[ 6] = "³     Betatesting/Playtesting by Tommy Berg Kristoffersen                      ³\0";
+     end_text[ 7] = "ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´\0";
+     end_text[ 8] = "³ I hope you enjoyed playing MegaBreak. Whatever you think of it, I would      ³\0";
+     end_text[ 9] = "³ really appreciate it if you could e-mail me some comments, suggestions or    ³\0";
+     end_text[10] = "³ whatever.                                                                    ³\0";
+     end_text[11] = "ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´\0";
+     end_text[12] = "³ Don't forget that you can make your ³ MegaBreak on the net! You are welcome  ³\0";
+     end_text[13] = "³ own levels for MegaBreak using the  ³ to check out my MegaBreak page. As     ³\0";
+     end_text[14] = "³ supplied Level Editor. Check out    ³ well as some history and general info  ³\0";
+     end_text[15] = "³ manual.txt for details.             ³ you will be able to find extra levels  ³\0";
+     end_text[16] = "³                                     ³ here in the future. (That is, if       ³\0";
+     end_text[17] = "³                                     ³ anyone makes some cool levels)         ³\0";
+     end_text[18] = "ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´\0";
+     end_text[19] = "³ Wanna create an official extra-levels pack for MegaBreak?   Contact me!     ³\0";
+     end_text[20] = "ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´\0";
+     end_text[21] = "³ MegaBreak Homepage: http://www.sn.no/~oruud/       E-mail: oeyruud@online.no ³\0";
+     end_text[22] = "ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ\0";
 }
 
 int alloc_memory()

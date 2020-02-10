@@ -11,23 +11,23 @@ void wait_vbl();
 void plot(long x, long y, long colour);
 void do_plot();
 void draw_box(long x, long y, long xlen, long ylen, long colour);
-void do_draw_box(struct BoxParams *boxParams);
+void do_draw_box();
 void bput_block(long x, long y, long xlen, long ylen, byte *imgpnt, byte *scr);
-void do_bput_block(struct PutBlockParams *putBlockParams, byte *imgpnt, byte *scr);
+void do_bput_block(byte *imgpnt, byte *scr);
 void put_block(long x, long y, long xlen, long ylen, byte *imgpnt);
 void do_put_block(byte *imgpnt);
 void cput_block(long x, long y, long xlen, long ylen, byte *imgpnt);
-void do_cput_block(struct PutBlockParams *putBlockParams, byte *imgpnt);
+void do_cput_block(byte *imgpnt);
 void bdraw_box(long x, long y, long xlen, long ylen, long colour, byte *scr);
-void do_bdraw_box(struct BoxParams *boxParams, byte *scr);
+void do_bdraw_box(byte *scr);
 void put_sprite(long x, long y, long xlen, long ylen, byte *imgpnt);
-void do_put_sprite(struct PutBlockParams *putBlockParams, byte *imgpnt);
+void do_put_sprite(byte *imgpnt);
 void bput_sprite(long x, long y, long xlen, long ylen, byte *imgpnt, byte *buffer);
-void do_bput_sprite(struct PutBlockParams *putBlockParams, byte *imgpnt, byte *buffer);
+void do_bput_sprite(byte *imgpnt, byte *buffer);
 void block_copy(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, int destx, int desty);
-void do_block_copy(struct BlockCopyParams *params, byte *buffer);
+void do_block_copy(byte *buffer);
 void block_copy_b(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, int destx, int desty, byte *destimg);
-void do_block_copy_b(struct BlockCopyParams *params, byte *buffer);
+void do_block_copy_b(byte *buffer, byte *destimg);
 short detectvga();
 
 long _clipart = 0;
@@ -81,12 +81,6 @@ short detect_vga()
     "jz   loop2"\
     modify [DX AL];
 
-struct PlotParams {
-    long x;
-    long y;
-    long colour;
-};
-
 void plot(long x, long y, long colour)
 {
     _x = x;
@@ -109,90 +103,75 @@ void plot(long x, long y, long colour)
     "mov     BYTE PTR [edi], dl" \
 modify [eax ebx edx edi];
 
-struct BoxParams {
-    long x;
-    long y;
-    long xlen;
-    long ylen;
-    long colour;
-};
-
 void draw_box(long x, long y, long xlen, long ylen, long colour)
 {
-    BoxParams params;
-    params.x = x;
-    params.y = y;
-    params.xlen = xlen;
-    params.ylen = ylen;
-    params.colour = colour;
-    do_draw_box(&params);
+    _x = x;
+    _y = y;
+    _xlen = xlen;
+    _ylen = ylen;
+    _colour = colour;
+    do_draw_box();
 }
 
 #pragma aux do_draw_box = \
-    "mov    eax, [edx]"         /* x */ \
-    "mov    ebx, [edx + 4]"     /* y */ \
-    "mov    edi, 0A0000h" \
-    "mov    ecx, eax"           /* Calculate pixel-position.. */ \
-    "shl    eax, 8" \
-    "shl    ecx, 6" \
-    "add    eax, ecx" \
-    "add    eax, ebx" \
-    "add    edi, eax" \
-    "mov    ebx, 320"           /* Kalkuler mengde som må legges til DI etter hver linje */ \
-    "sub    ebx, [edx + 8]"     /* 320 - xlen */ \
-    "mov    ah, [edx + 15]"     /* ylen - needs only a byte since y will be max 200 */ \
-    "mov    al, [edx + 19]"     /* colour */ \
+    "mov     eax,_y" \
+    "mov     ebx,_x" \
+    "mov     edi,0A0000h" \
+    "mov     ecx,eax" \
+    "shl     eax,8" \
+    "shl     ecx,6" \
+    "add     eax,ecx" \
+    "add     eax,ebx" \
+    "add     edi,eax" \
+    "mov     ebx,320" \
+    "mov     edx,_xlen" \
+    "sub     ebx,edx" \
+    "mov     eax,_ylen" \
+    "mov     edx,_colour" \
 "next_line:" \
-    "mov    ecx, [edx + 8]"     /* xlen */ \
+    "mov     ecx,_xlen" \
 "next:" \
-    "mov    [edi], al"          /* Legg en byte til EDI */ \
-    "dec    ecx" \
-    "inc    edi" \
-    "or     ecx,ecx" \
-    "jnz    next" \
-    "dec    ah" \
-    "add    edi,ebx"            /* Legg til slik at neste linje begynner */ \
-    "or     ah,ah"              /* Er vertikal teller 0 ennå? */ \
-    "jnz    next_line" \
-parm [edx] \
+    "mov     BYTE PTR [edi],dl" \
+    "dec     ecx" \
+    "inc     edi" \
+    "or      ecx,ecx" \
+    "jnz     next" \
+    "dec     eax" \
+    "add     edi,ebx" \
+    "or      eax,eax" \
+    "jnz     next_line" \
 modify [eax ebx ecx edx edi];
-
-struct PutBlockParams {
-    long x;
-    long y;
-    long xlen;
-    long ylen;
-};
 
 void bput_block(long x, long y, long xlen, long ylen, byte *imgpnt, byte *scr)
 {
-    PutBlockParams params;
-    params.x = x;
-    params.y = y;
-    params.xlen = xlen;
-    params.ylen = ylen;
-    do_bput_block(&params, imgpnt, scr);
+    _x = x;
+    _y = y;
+    _xlen = xlen;
+    _ylen = ylen;
+    do_bput_block(imgpnt, scr);
 }
 
 #pragma aux do_bput_block = \
-    "mov     eax, [ebx + 4]"     /* y */ \
-    "mov     ecx, eax" \
-    "shl     eax, 8" \
-    "shl     ecx, 6" \
-    "add     eax, ecx"           /* Legg sammen begge Y-ene */ \
-    "add     eax, [ebx]"           /* Legg til X */ \
-    "add     edi, eax"           /* Ferdig koordinat ligger nå i EDI */ \
-    "mov     edx, 320"           /* Kalkuler mengde som må legges til EDI etter hver linje */ \
-    "sub     edx, [ebx + 8]"     /* 320 - xlen */ \
-    "mov     eax, [ebx + 12]"    /* Legg vertikal teller i EAX */ \
-"next_line:" \
-    "mov     ecx, [ebx + 8]"           /* xlen */ \
-    "rep     movsb"             /* Tegn opp en linje.. */ \
-    "dec     eax"               /* En linje mindre.. */ \
-    "add     edi, edx"           /* Legg til slik at neste linje begynner under.. */ \
-    "or      eax, eax"           /* Vertikal teller 0 ennå? */ \
-    "jnz     next_line"        /* Nei - gå til neste linje */ \
-parm [ebx] [esi] [edi] \
+    "mov     eax,_y" \
+    "mov     ebx,_x" \
+    "mov     ecx,eax" \
+    "shl     eax,8" \
+    "shl     ecx,6" \
+    "add     eax,ecx"             /* Legg sammen begge Y-ene */ \
+    "add     eax,ebx"             /* Legg til X */ \
+    "add     edi,eax"             /* Ferdig koordinat ligger nå i EDI */ \
+    "mov     edx,320"             /* Kalkuler mengde som må legges til EDI på */ \
+    "mov     ebx,_xlen"          /* slutten av hver linje. */ \
+    "sub     edx,ebx"             /* Mengde ligger i EDX */ \
+    "mov     eax,_ylen"          /* Legg vertikal teller i EAX */ \
+    "next_line:" \
+    "mov     ecx,ebx"             /* Legg linje-teller i ECX */ \
+    "rep     movsb"               /* Tegn opp en linje.. */ \
+    "dec     eax"                 /* En linje mindre.. */ \
+    "add     edi,edx"             /* Legg til slik at neste linje begynner under.. */ \
+    "or      eax,eax"             /* Vertikal teller 0 ennå? */ \
+    "jnz     next_line"          /* Nei - gå til neste linje */ \
+parm [esi] [edi] \
 modify [eax ebx ecx edx edi];
 
 void put_block(long x, long y, long xlen, long ylen, byte *imgpnt)
@@ -230,16 +209,11 @@ modify [eax ebx ecx edx edi esi];
 
 void cput_block(long x, long y, long xlen, long ylen, byte *imgpnt)
 {
-    PutBlockParams params;
-    params.x = x;
-    params.y = y;
-    params.xlen = xlen;
-    params.ylen = ylen;
     _x = x;
     _y = y;
     _xlen = xlen;
     _ylen = ylen;
-    do_cput_block(&params, imgpnt);
+    do_cput_block(imgpnt);
 }
 
 #pragma aux do_cput_block = \
@@ -293,23 +267,17 @@ void cput_block(long x, long y, long xlen, long ylen, byte *imgpnt)
     "or     eax,eax"             /* Vertikal teller 0 ennå? */ \
     "jnz    cnext_line"          /* Nei - gå til neste linje */ \
 "cend:" \
-parm [ebx] [esi] \
+parm [esi] \
 modify [eax ebx ecx edx esi edi];
 
 void bdraw_box(long x, long y, long xlen, long ylen, long colour, byte *scr)
 {
-    BoxParams params;
-    params.x = x;
-    params.y = y;
-    params.xlen = xlen;
-    params.ylen = ylen;
-    params.colour = colour;
     _x = x;
     _y = y;
     _xlen = xlen;
     _ylen = ylen;
     _colour = colour;
-    do_bdraw_box(&params, scr);
+    do_bdraw_box(scr);
 }
 
 #pragma aux do_bdraw_box = \
@@ -329,7 +297,7 @@ void bdraw_box(long x, long y, long xlen, long ylen, long colour, byte *scr)
 "next_line:" \
     "mov    ecx,_xlen"        /* Horisontal teller i CX */ \
 "next:" \
-    "mov    [edi],dl"    /* Legg en byte til EDI */ \
+    "mov    BYTE PTR [edi],dl"    /* Legg en byte til EDI */ \
     "dec    ecx" \
     "inc    edi" \
     "or     ecx,ecx" \
@@ -338,21 +306,16 @@ void bdraw_box(long x, long y, long xlen, long ylen, long colour, byte *scr)
     "add    edi,ebx"     /* Legg til slik at neste linje begynner */ \
     "or     eax,eax"     /* Er vertikal teller 0 ennå? */ \
     "jnz    next_line" \
-parm [ebx] [edi] \
-modify [eax ebx ecx edx esi edi];
+parm [edi] \
+modify [eax ebx ecx edx edi];
 
 void put_sprite(long x, long y, long xlen, long ylen, byte *imgpnt)
 {
-    PutBlockParams params;
-    params.x = x;
-    params.y = y;
-    params.xlen = xlen;
-    params.ylen = ylen;
     _x = x;
     _y = y;
     _xlen = xlen;
     _ylen = ylen;
-    do_put_sprite(&params, imgpnt);
+    do_put_sprite(imgpnt);
 }
 
 #pragma aux do_put_sprite = \
@@ -375,7 +338,7 @@ void put_sprite(long x, long y, long xlen, long ylen, byte *imgpnt)
     "mov  bl,[esi]"                   /* Få en byte fra SI */ \
     "or   bl,bl"                    /* Er den 0? */ \
     "je   skip_pixel"                 /* OK - Skip den */ \
-    "mov  [edi],bl"                   /* Nei - Tegn den */ \
+    "mov  BYTE PTR [edi],bl"                   /* Nei - Tegn den */ \
     "inc  edi" \
     "inc  esi" \
     "dec  ecx"                        /* En pixel tegnet... */ \
@@ -397,21 +360,16 @@ void put_sprite(long x, long y, long xlen, long ylen, byte *imgpnt)
     "dec  eax"                        /* En linje mindre.. */ \
     "jnz  bloop1"                      /* Hvis den ikke er 0, initialiser teller på nytt. */ \
 "bend:" \
-parm [ebx] [esi] \
+parm [esi] \
 modify [eax ebx ecx edx esi edi];
 
 void bput_sprite(long x, long y, long xlen, long ylen, byte *imgpnt, byte *buffer)
 {
-    PutBlockParams params;
-    params.x = x;
-    params.y = y;
-    params.xlen = xlen;
-    params.ylen = ylen;
     _x = x;
     _y = y;
     _xlen = xlen;
     _ylen = ylen;
-    do_bput_sprite(&params, imgpnt, buffer);
+    do_bput_sprite(imgpnt, buffer);
 }
 
 #pragma aux do_bput_sprite = \
@@ -433,7 +391,7 @@ void bput_sprite(long x, long y, long xlen, long ylen, byte *imgpnt, byte *buffe
     "mov  bl,[esi]"                   /* Få en byte fra SI*/ \
     "or   bl,bl"                    /* Er den 0?*/ \
     "je   bskip_pixel"                 /* OK - Skip den*/ \
-    "mov  [edi],bl"                   /* Nei - Tegn den*/ \
+    "mov  BYTE PTR [edi],bl"                   /* Nei - Tegn den*/ \
     "inc  edi" \
     "inc  esi" \
     "dec  ecx"                        /* En pixel tegnet...*/ \
@@ -455,34 +413,18 @@ void bput_sprite(long x, long y, long xlen, long ylen, byte *imgpnt, byte *buffe
     "dec  eax"                        /* En linje mindre..*/ \
     "jnz  bbloop1"                      /* Hvis den ikke er 0, initialiser teller på nytt*/ \
 "bbend:" \
-parm [ebx] [esi] [edi] \
+parm [esi] [edi] \
 modify [eax ebx ecx edx esi edi];
-
-struct BlockCopyParams {
-    long srcx;
-    long srcy;
-    long srcxlen;
-    long srcylen;
-    long dstx;
-    long dsty;
-};
 
 void block_copy(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, int destx, int desty)
 {
-    BlockCopyParams params;
-    params.srcx = srcx;
-    params.srcy = srcy;
-    params.srcxlen = srcxlen;
-    params.srcylen = srcylen;
-    params.dstx = destx;
-    params.dsty = desty;
     _srcx = srcx;
     _srcy = srcy;
     _srcxlen = srcxlen;
     _srcylen = srcylen;
     _dstx = destx;
     _dsty = desty;
-    do_block_copy(&params, buffer);
+    do_block_copy(buffer);
 }
 
 #pragma aux do_block_copy = \
@@ -513,25 +455,18 @@ void block_copy(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, int 
     "add    edi,edx"             /* Legg til 'linjeskift' på skjerm */ \
     "or     eax,eax"             /* Vertikal teller 0 ennå? */ \
     "jnz    next_line"          /* Nei - gå til neste linje */ \
-parm [ebx] [esi] \
+parm [esi] \
 modify [eax ebx ecx edx esi edi];
 
 void block_copy_b(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, int destx, int desty, byte *destimg)
 {
-    BlockCopyParams params;
-    params.srcx = srcx;
-    params.srcy = srcy;
-    params.srcxlen = srcxlen;
-    params.srcylen = srcylen;
-    params.dstx = destx;
-    params.dsty = desty;
     _srcx = srcx;
     _srcy = srcy;
     _srcxlen = srcxlen;
     _srcylen = srcylen;
     _dstx = destx;
     _dsty = desty;
-    do_block_copy_b(&params, buffer);
+    do_block_copy_b(buffer, destimg);
 }
 
 #pragma aux do_block_copy_b = \
@@ -561,5 +496,5 @@ void block_copy_b(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, in
     "add     edi,edx"             /* Legg til 'linjeskift' på skjerm */ \
     "or      eax,eax"             /* Vertikal teller 0 ennå? */ \
     "jnz     next_line"          /* Nei - gå til neste linje */ \
-parm [ebx] [esi] [edi] \
+parm [esi] [edi] \
 modify [eax ebx ecx edx esi edi];

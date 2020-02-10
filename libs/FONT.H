@@ -126,7 +126,7 @@ void write(char *text, int x, int y, byte *fontdata[50])
 
     // Blit text til skjermen
     for (i=0; i<stringlength; i++) {
-        if (*(newstring + i) != 51) {
+        if (*(newstring + i) < 51) {
             put_block(x+(i*FONT_WIDTH), y, FONT_WIDTH, FONT_HEIGHT, fontdata[*(newstring + i)]);
             x++;    // En pixel mellomrom mellom bokstavene
         }
