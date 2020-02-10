@@ -1,5 +1,5 @@
 .386P
-.MODEL FLAT
+.MODEL FLAT, C
 
 
 _TEXT SEGMENT DWORD PUBLIC 'CODE'
@@ -101,12 +101,10 @@ text_mode   ENDP
 ; Blits a graphics-block to the screen.
 ; ********************************************************************
 
-put_block    PROC NEAR
+put_block    PROC NEAR X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, IMGPNT:DWORD
 
 push    ebp
 mov     ebp,esp
-
-ARG     X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, IMGPNT:DWORD
 
 ; Kopier parametre..
 mov     eax,[Y]
@@ -147,12 +145,10 @@ put_block    ENDP
 ; Blits a graphics-block to a virtual screen
 ; ********************************************************************
 
-bput_block    PROC NEAR
+bput_block    PROC NEAR X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, IMGPNT:DWORD, SCR:DWORD
 
 push    ebp
 mov     ebp,esp
-
-ARG     X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, IMGPNT:DWORD, SCR:DWORD
 
 ; Kopier parametre..
 mov     eax,[Y]
@@ -194,13 +190,10 @@ bput_block    ENDP
 ; Plots a pixel on the screen.
 ; ******************************************************************
 
-plot    PROC NEAR
+plot    PROC NEAR X:DWORD, Y:DWORD, COLOUR:DWORD
 
 push    ebp
 mov     ebp,esp
-
-; Parametre
-ARG     X:DWORD, Y:DWORD, COLOUR:DWORD
 
 mov     eax,[Y]
 mov	ebx,[X]
@@ -234,13 +227,10 @@ plot   ENDP
 ; Plots a pixel on the screen.
 ; ******************************************************************
 
-h_line    PROC NEAR
+h_line    PROC NEAR X:DWORD, Y:DWORD, X2:DWORD, COLOUR:BYTE
 
 push    ebp
 mov     ebp,esp
-
-; Parametre
-ARG     X:DWORD, Y:DWORD, X2:DWORD, COLOUR:BYTE
 
 mov     eax,[Y]
 mov	ebx,[X]
@@ -326,9 +316,7 @@ clear_screen	ENDP
 ; gangen. Parameter mσ inneholde en blokk med farge (f.x. 0FFFFFFFFh)
 ; **********************************************************************
 
-clear_screen_c	PROC	NEAR
-
-	ARG   COLOUR:DWORD
+clear_screen_c	PROC	NEAR COLOUR:DWORD
 
 	push    ebp
 	mov     ebp,esp
@@ -358,12 +346,10 @@ clear_screen_c	ENDP
 ; Funksjonen tegner en boks etter fargen spesifisert i colour..
 ; *******************************************************************
 
-draw_box	PROC	NEAR
+draw_box	PROC	NEAR X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, COLOUR:DWORD
 	
 	push  ebp
 	mov   ebp, esp
-
-	ARG X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, COLOUR:DWORD
 
 	mov     eax,[Y]
 	mov	ebx,[X]
@@ -406,17 +392,15 @@ draw_box	ENDP
 ; Funksjonen tegner en boks etter fargen spesifisert i colour..
 ; *******************************************************************
 
-bdraw_box        PROC    NEAR
+bdraw_box        PROC    NEAR X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, COLOUR:DWORD, SCR:DWORD
 	
 	push  ebp
 	mov   ebp, esp
 
-        ARG X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, COLOUR:DWORD, SCR:DWORD
-
 	mov     eax,[Y]
-	mov	ebx,[X]
+	mov	   ebx,[X]
 
-        mov     edi,SCR
+    mov     edi,SCR
 	mov     ecx,eax		; Calculate pixel-position..
 	shl     eax,8                     
 	shl     ecx,6                     
@@ -454,12 +438,10 @@ bdraw_box        ENDP
 ; Copies the contents of one screen to another screen (64K)
 ; ********************************************************************
 
-screen_copy    PROC NEAR
+screen_copy    PROC NEAR DEST:DWORD, SRC:DWORD
 
         push    ebp
         mov     ebp,esp
-
-        ARG     DEST:DWORD, SRC:DWORD
 
         mov     esi, SRC
         mov     edi, DEST
@@ -487,12 +469,10 @@ screen_copy     ENDP
 xcounter        dd      ?
 ycounter        dd      ?
 
-draw_light      PROC    NEAR
+draw_light      PROC    NEAR X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, LIGHTPTR:DWORD, IMGPTR:DWORD
 
         push  ebp
         mov   ebp, esp
-
-ARG X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, LIGHTPTR:DWORD, IMGPTR:DWORD
 
         mov   esi, LIGHTPTR
         mov   ebx, IMGPTR
@@ -570,12 +550,10 @@ draw_light      ENDP
 ; 0 blir ikke tegnet, slik at bildet blir transparent.
 ; ************************************************************************
 
-put_sprite      PROC    NEAR
+put_sprite      PROC    NEAR X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, IMGPNT:DWORD
 
         push    ebp
         mov     ebp,esp
-
-        ARG     X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, IMGPNT:DWORD
 
         ; Kopier parametre..
         mov     eax,[Y]
@@ -637,12 +615,10 @@ put_sprite      ENDP
 ; 0 blir ikke tegnet, slik at bildet blir transparent.
 ; ************************************************************************
 
-bput_sprite      PROC    NEAR
+bput_sprite      PROC    NEAR X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, IMGPNT:DWORD, BUF:DWORD
 
         push    ebp
         mov     ebp,esp
-
-        ARG     X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, IMGPNT:DWORD, BUF:DWORD
 
         ; Kopier parametre..
         mov     eax,[Y]
@@ -705,12 +681,10 @@ bput_sprite      ENDP
 ; screen.
 ; ********************************************************************
 
-block_copy      PROC NEAR
+block_copy      PROC NEAR SRCX:DWORD, SRCY:DWORD, SRCXLEN:DWORD, SRCYLEN:DWORD, SRCIMG:DWORD, DESTX:DWORD, DESTY:DWORD
 
 push    ebp
 mov     ebp,esp
-
-ARG     SRCX:DWORD, SRCY:DWORD, SRCXLEN:DWORD, SRCYLEN:DWORD, SRCIMG:DWORD, DESTX:DWORD, DESTY:DWORD
 
 ; Kalkuler koordinater for virtuell skjerm (SRCIMG)
 mov     esi,SRCIMG
@@ -763,12 +737,10 @@ block_copy    ENDP
 ; another buffer.
 ; ********************************************************************
 
-block_copy_b      PROC NEAR
+block_copy_b      PROC NEAR SRCX:DWORD, SRCY:DWORD, SRCXLEN:DWORD, SRCYLEN:DWORD, SRCIMG:DWORD, DESTX:DWORD, DESTY:DWORD, DESTIMG:DWORD
 
 push    ebp
 mov     ebp,esp
-
-ARG     SRCX:DWORD, SRCY:DWORD, SRCXLEN:DWORD, SRCYLEN:DWORD, SRCIMG:DWORD, DESTX:DWORD, DESTY:DWORD, DESTIMG:DWORD
 
 ; Kalkuler koordinater for virtuell skjerm (SRCIMG)
 mov     esi,SRCIMG
@@ -819,12 +791,10 @@ block_copy_b    ENDP
 ; Blits a graphics-block to the screen w/ clipping.
 ; ********************************************************************
 
-cput_block    PROC NEAR
+cput_block    PROC NEAR X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, IMGPNT:DWORD
 
 push    ebp
 mov     ebp,esp
-
-ARG     X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, IMGPNT:DWORD
 
 ; Kopier parametre..
 mov     eax,[Y]
@@ -991,12 +961,10 @@ mode400         ENDP
 ; Plots a Mode-X pixel
 ; ********************************************************************
 
-xplot   PROC NEAR
+xplot   PROC NEAR X:DWORD, Y:DWORD, COLOUR:BYTE
 
 push    ebp
 mov     ebp,esp
-
-ARG     X:DWORD, Y:DWORD, COLOUR:BYTE
 
 ; Kopier parametre
 mov     ecx, [X]
@@ -1037,12 +1005,10 @@ xplot   ENDP
 ; use of rep movsd.
 ; ********************************************************************
 
-xput_block      PROC NEAR
+xput_block      PROC NEAR X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, IMGPNT:DWORD
 
 push    ebp
 mov     ebp,esp
-
-ARG     X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, IMGPNT:DWORD
 
 ; Kopier parametre
 mov     ecx, [X]
@@ -1114,12 +1080,10 @@ xput_block      ENDP
 
 
 
-anti_alias      PROC NEAR
+anti_alias      PROC NEAR X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, SCRPNT:DWORD
 
 push    ebp
 mov     ebp,esp
-
-ARG     X:DWORD, Y:DWORD, XLEN:DWORD, YLEN:DWORD, SCRPNT:DWORD
 
 ; Kalkuler startpunkt
 mov     eax, [Y]
