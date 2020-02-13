@@ -48,8 +48,9 @@ int main(int argc, char *argv[])
         put_block(curMouseX, curMouseY, SHIP_WIDTH, SHIP_HEIGHT, ship[curState]);
         wait_vbl();
         get_mouse_status();
-        deltaX = curMouseX - MOUSE_X;
-        deltaY = curMouseY - MOUSE_Y;
+
+        deltaX = MOUSE_X - curMouseX;
+        deltaY = MOUSE_Y - curMouseY;
 
         if (deltaX < 0) {
             xOffset = SHIP_WIDTH;
@@ -62,9 +63,8 @@ int main(int argc, char *argv[])
             yOffset = 0;
         }
 
-        draw_box(MOUSE_X + deltaX, MOUSE_Y + deltaY, abs(deltaX), abs(deltaY), 10);
-        
-//        draw_box(smallestNumber(MOUSE_X + deltaX, MOUSE_X), smallestNumber(MOUSE_Y + deltaY, MOUSE_Y), SHIP_WIDTH, abs(deltaY), 0);
+        draw_box(smallestNumber(curMouseX, MOUSE_X) + xOffset, curMouseY, abs(deltaX) + 1, SHIP_HEIGHT, 0);
+        draw_box(curMouseX, smallestNumber(curMouseY, MOUSE_Y) + yOffset, SHIP_WIDTH, abs(deltaY) + 1, 0);
 
         curMouseX = MOUSE_X;
         curMouseY = MOUSE_Y;
