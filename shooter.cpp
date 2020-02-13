@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 
         if (freezeFrames == 0) {
             if (abs(deltaX) >= moveWithAnimTreshold) {
-                targetState = deltaX > 0 ? 4 : 0;
+                targetState = deltaX > 0 ? 0 : 4;
             } else {
                 targetState = 2;
             }
