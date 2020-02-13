@@ -61,7 +61,8 @@ int main(int argc, char *argv[])
         } else {
             yOffset = 0;
         }
-        draw_box(MOUSE_X + xOffset, MOUSE_Y + deltaY, abs(deltaX), SHIP_HEIGHT, 1);
+
+        draw_box(MOUSE_X + deltaX, MOUSE_Y + deltaY, abs(deltaX), abs(deltaY), 10);
         
 //        draw_box(smallestNumber(MOUSE_X + deltaX, MOUSE_X), smallestNumber(MOUSE_Y + deltaY, MOUSE_Y), SHIP_WIDTH, abs(deltaY), 0);
 

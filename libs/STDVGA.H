@@ -110,6 +110,11 @@ void draw_box(long x, long y, long xlen, long ylen, long colour)
     _xlen = xlen;
     _ylen = ylen;
     _colour = colour;
+
+    if (x > 319 || y > 199) return;
+    if (x + xlen > 319) xlen = 319 - x;
+    if (y + ylen > 199) ylen = 199 - y;
+
     do_draw_box();
 }
 
@@ -213,7 +218,10 @@ void cput_block(long x, long y, long xlen, long ylen, byte *imgpnt)
     _y = y;
     _xlen = xlen;
     _ylen = ylen;
-    do_cput_block(imgpnt);
+    if (x + xlen < 320 && y + ylen < 200)
+        do_put_block(imgpnt);
+    else
+        do_cput_block(imgpnt);
 }
 
 #pragma aux do_cput_block = \
