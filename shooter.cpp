@@ -13,12 +13,26 @@ short quit = FALSE;
 short smallestNumber(short a, short b);
 short largestNunber(short a, short b);
 
+struct Bullet {
+    short x;
+    short y;
+};
+
 int main(int argc, char *argv[])
 {
     static byte ship[5][512];
+    static byte bullet[12];
     static signed char palette[768];
+    Bullet bullets[20];
+
+    for (short i = 0; i < 20; i++) {
+        bullets[i].x = 0;
+        bullets[i].y = 0;
+    }
+
     short key = 0;
 
+    pcxRead("bullets.pcx", bullet, palette, 4, 3);
     pcxRead("ship_ll.pcx", ship[0], palette, 16, 32);
     pcxRead("ship_l.pcx", ship[1], palette, 16, 32);
     pcxRead("ship.pcx", ship[2], palette, 16, 32);
@@ -27,6 +41,7 @@ int main(int argc, char *argv[])
 
     mode_13h();
     set_pal(palette);
+    set_mouse_sens(20,16);
     xlimit_mouse(8,300);
     ylimit_mouse(167,167);
     get_mouse_status();
@@ -38,6 +53,10 @@ int main(int argc, char *argv[])
     short curState = 2;
     short freezeFrames = 0;
 
+    short SHOT_DELAY = 10;
+    short shotDelay = 0;
+    short shotVelocity = 4;
+
     const short SHIP_WIDTH = 16;
     const short SHIP_HEIGHT = 32;
 
@@ -45,7 +64,35 @@ int main(int argc, char *argv[])
     short yOffset = 0;
 
     while (quit == FALSE) {
+        if (shotDelay == 0 && BUTTON_STATE == 1)
+        {
+            short freeBulletSlot = -1;
+            for (short i = 0; i < 20; i++) {
+                if (bullets[i].y <= 0) {
+                    freeBulletSlot = i;
+                    break;
+                }
+            }
+            if (freeBulletSlot >= 0) {
+                bullets[freeBulletSlot].x = curMouseX + 6;
+                bullets[freeBulletSlot].y = curMouseY - 4;
+                shotDelay = SHOT_DELAY;
+            }
+        }
+        // update bullets
+        if (shotDelay > 0) shotDelay--;
+        for (short i = 0; i < 20; i++) {
+            if (bullets[i].y > 0) {
+                draw_box(bullets[i].x, bullets[i].y, 4, 3, 0);
+                bullets[i].y -= shotVelocity;
+            }
+            if (bullets[i].y > 0) {
+                put_block(bullets[i].x, bullets[i].y, 4, 3, bullet);
+            }
+        }
+
         put_block(curMouseX, curMouseY, SHIP_WIDTH, SHIP_HEIGHT, ship[curState]);
+
         wait_vbl();
         get_mouse_status();
 
@@ -94,7 +141,7 @@ int main(int argc, char *argv[])
     }
 
     text_mode();
-//    reset_mouse();
+    reset_mouse();
 }
 
 short smallestNumber(short a, short b) {
