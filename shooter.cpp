@@ -10,6 +10,9 @@ const short TRUE = 1;
 const short FALSE = 0;
 short quit = FALSE;
 
+short smallestNumber(short a, short b);
+short largestNunber(short a, short b);
+
 int main(int argc, char *argv[])
 {
     static byte ship[5][512];
@@ -28,18 +31,41 @@ int main(int argc, char *argv[])
     ylimit_mouse(167,167);
     get_mouse_status();
 
-    short curMouseX = MOUSE_X, curMouseY = MOUSE_Y, deltaX = 0;
+    short curMouseX = MOUSE_X, curMouseY = MOUSE_Y;
+    signed short deltaX = 0, deltaY = 0;
     short moveWithAnimTreshold = 2;
     short targetState = 2;
     short curState = 2;
     short freezeFrames = 0;
 
+    const short SHIP_WIDTH = 16;
+    const short SHIP_HEIGHT = 32;
+
+    short xOffset = 0;
+    short yOffset = 0;
+
     while (quit == FALSE) {
-        put_block(curMouseX, curMouseY, 16, 32, ship[curState]);
+        put_block(curMouseX, curMouseY, SHIP_WIDTH, SHIP_HEIGHT, ship[curState]);
         wait_vbl();
         get_mouse_status();
-        draw_box(curMouseX, curMouseY, 16, 32, 0);
-        deltaX = curMouseX - MOUSE_X;
+
+        deltaX = MOUSE_X - curMouseX;
+        deltaY = MOUSE_Y - curMouseY;
+
+        if (deltaX < 0) {
+            xOffset = SHIP_WIDTH;
+        } else {
+            xOffset = 0;
+        }
+        if (deltaY < 0) {
+            yOffset = SHIP_HEIGHT;
+        } else {
+            yOffset = 0;
+        }
+
+        draw_box(smallestNumber(curMouseX, MOUSE_X) + xOffset, curMouseY, abs(deltaX) + 1, SHIP_HEIGHT, 0);
+        draw_box(curMouseX, smallestNumber(curMouseY, MOUSE_Y) + yOffset, SHIP_WIDTH, abs(deltaY) + 1, 0);
+
         curMouseX = MOUSE_X;
         curMouseY = MOUSE_Y;
 
@@ -69,4 +95,12 @@ int main(int argc, char *argv[])
 
     text_mode();
 //    reset_mouse();
+}
+
+short smallestNumber(short a, short b) {
+    return a < b ? a : b;
+}
+
+short largestNunber(short a, short b) {
+    return a > b ? a : b;
 }

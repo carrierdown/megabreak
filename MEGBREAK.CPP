@@ -1,8 +1,7 @@
 /*
     MegaBreak v 1.0
-    By Knut A. Ruud
 
-    (C) 1995/96/97 riot Entertainment
+    COPYRIGHT (C) 1995/96/97 Knut A. Ruud
 */
 
 #include <conio.h>
