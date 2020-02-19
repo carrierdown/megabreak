@@ -22,6 +22,9 @@ void initMouse();
 short checkShotFired(short shotDelay, short curMouseX, short curMouseY);
 short updateBullets(short shotDelay, short shotVelocity);
 void clearShip(short curMouseX, short curMouseY, signed short deltaX, signed short deltaY);
+// To add:
+void spawnEnemy();
+void clippingPutBlock();
 
 struct Bullet {
     short x;
@@ -41,7 +44,7 @@ int main(int argc, char *argv[])
     initMouse();
 
     short curMouseX = MOUSE_X, curMouseY = MOUSE_Y;
-    unsigned short deltaX = 0, deltaY = 0;
+    signed short deltaX = 0, deltaY = 0;
     short targetState = 2;
     short curState = 2;
     short freezeFrames = 0;
@@ -189,4 +192,14 @@ void clearShip(short curMouseX, short curMouseY, signed short deltaX, signed sho
 
     draw_box(smallestNumber(curMouseX, MOUSE_X) + xOffset, curMouseY, abs(deltaX) + 1, SHIP_HEIGHT, 0);
     draw_box(curMouseX, smallestNumber(curMouseY, MOUSE_Y) + yOffset, SHIP_WIDTH, abs(deltaY) + 1, 0);
+}
+
+void spawnEnemy()
+{
+
+}
+
+void clippingPutBlock()
+{
+
 }
