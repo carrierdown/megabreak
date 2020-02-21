@@ -26,6 +26,8 @@ short updateBullets(short shotDelay, short shotVelocity);
 void clearShip(short curMouseX, short curMouseY, signed short deltaX, signed short deltaY);
 void initEnemy();
 void spawnEnemy();
+void clearAndMoveEnemy();
+void handlePlayerShipAnimation(short& freezeFrames, short& targetState, short& curState, signed short deltaX);
 
 struct Bullet {
     short x;
@@ -76,10 +78,12 @@ int main(int argc, char *argv[])
         shotDelay = checkShotFired(shotDelay, curMouseX, curMouseY);
         shotDelay = updateBullets(shotDelay, shotVelocity);
 
+        // draw enemy ship
         if (enemy.y < 200) {
             clip_put_block(enemy.x, enemy.y, enemy.width, enemy.height, enemyShip);
         }
 
+        // draw player ship
         put_block(curMouseX, curMouseY, SHIP_WIDTH, SHIP_HEIGHT, ship[curState]);
 
         wait_vbl();
@@ -89,11 +93,7 @@ int main(int argc, char *argv[])
         deltaY = MOUSE_Y - curMouseY;
 
         clearShip(curMouseX, curMouseY, deltaX, deltaY);
-
-        if (enemy.y >= 0 && enemy.y < 200) {
-            draw_box(enemy.x, enemy.y, enemy.width, enemy.yVel, 0);
-        }
-        if (enemy.y < 200) enemy.y += enemy.yVel;
+        clearAndMoveEnemy();
 
         if (spawnNewEnemy) {
             spawnEnemy();
@@ -103,21 +103,7 @@ int main(int argc, char *argv[])
         curMouseX = MOUSE_X;
         curMouseY = MOUSE_Y;
 
-        if (freezeFrames == 0) {
-            if (abs(deltaX) >= SHIP_ANIMATION_TRESHOLD) {
-                targetState = deltaX > 0 ? 0 : 4;
-            } else {
-                targetState = 2;
-            }
-
-            if (targetState != curState) {
-                if (targetState < curState) curState--;
-                if (targetState > curState) curState++;
-                freezeFrames = 10;
-            }
-        }
-
-        if (freezeFrames > 0) freezeFrames--;
+        handlePlayerShipAnimation(freezeFrames, targetState, curState, deltaX);
 
         if (kbhit()) {
             key = getch();
@@ -239,4 +225,30 @@ void spawnEnemy()
 {
     enemy.x = 100;
     enemy.y = -26;
+}
+
+void clearAndMoveEnemy()
+{
+    if (enemy.y >= 0 && enemy.y < 200) {
+        draw_box(enemy.x, enemy.y, enemy.width, enemy.yVel, 0);
+    }
+    if (enemy.y < 200) enemy.y += enemy.yVel;
+}
+
+void handlePlayerShipAnimation(short& freezeFrames, short& targetState, short& curState, signed short deltaX)
+{
+    if (freezeFrames == 0) {
+        if (abs(deltaX) >= SHIP_ANIMATION_TRESHOLD) {
+            targetState = deltaX > 0 ? 0 : 4;
+        } else {
+            targetState = 2;
+        }
+
+        if (targetState != curState) {
+            if (targetState < curState) curState--;
+            if (targetState > curState) curState++;
+            freezeFrames = 10;
+        }
+    }
+    if (freezeFrames > 0) freezeFrames--;
 }
