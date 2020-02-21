@@ -29,6 +29,7 @@ void do_block_copy(byte *buffer);
 void block_copy_b(int srcx, int srcy, int srcxlen, int srcylen, byte *buffer, int destx, int desty, byte *destimg);
 void do_block_copy_b(byte *buffer, byte *destimg);
 short detectvga();
+void clip_put_block(long x, long y, long xlen, long ylen, byte *imgpnt);
 
 long _clipart = 0;
 long _x = 0;
@@ -81,6 +82,59 @@ short detect_vga()
     "jz   loop2"\
     modify [DX AL];
 
+// proper clipping put block impl. Note: Max 4096 pixels (64x64).
+void clip_put_block(long x, long y, long xlen, long ylen, byte *imgpnt)
+{
+    byte dataToDraw[4096];
+
+    _x = x;
+    _y = y;
+    _xlen = xlen;
+    _ylen = ylen;
+    if (x + xlen < 0 || y + ylen < 0 || x > 319 || y > 199) return;
+    if (x > 0 && y > 0 && x + xlen < 320 && y + ylen < 200)
+    {
+        do_put_block(imgpnt);
+        return;
+    }
+    
+    long clippedXOffset = 0;
+    long clippedYOffset = 0;
+    long clippedXlen = xlen;
+    long clippedYlen = ylen;
+
+    if (x < 0) {
+        clippedXOffset = abs(x);
+        clippedXlen = xlen - clippedXOffset;
+    }
+    if (y < 0) {
+        clippedYOffset = abs(y);
+        clippedYlen = ylen - clippedYOffset;
+    }
+    if (x + xlen > 319) {
+        clippedXlen = 320 - x;
+    }
+    if (y + ylen > 199) {
+        clippedYlen = 200 - y;
+    }
+
+    long i = 0;
+    long imgIx = xlen * clippedYOffset;
+    for (long cy = clippedYOffset; cy < clippedYlen; cy++) {
+        imgIx += clippedXOffset;
+        for (long cx = clippedXOffset; cx < clippedXlen; cx++) {
+            dataToDraw[i++] = *(imgpnt + imgIx++);
+        }
+        if (clippedXlen < xlen) imgIx += xlen - clippedXlen;
+    }
+
+    _x = x + clippedXOffset;
+    _y = y + clippedYOffset;
+    _xlen = clippedXlen;
+    _ylen = clippedYlen;
+    do_put_block(dataToDraw);
+}
+
 void plot(long x, long y, long colour)
 {
     _x = x;
@@ -106,8 +160,8 @@ modify [eax ebx edx edi];
 void draw_box(long x, long y, long xlen, long ylen, long colour)
 {
     if (x > 319 || y > 199 || x < 0 || y < 0) return;
-    if (x + xlen > 319) xlen = 319 - x;
-    if (y + ylen > 199) ylen = 199 - y;
+    if (x + xlen > 319) xlen = 320 - x;
+    if (y + ylen > 199) ylen = 200 - y;
     if (ylen == 0 || xlen == 0) return;
 
     _x = x;
