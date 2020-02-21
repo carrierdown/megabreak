@@ -82,18 +82,18 @@ short detect_vga()
     "jz   loop2"\
     modify [DX AL];
 
-// proper clipping put block impl. Note: Max 4096 pixels (64x64).
+// clipping put block impl. Note: Max 4096 pixels (64x64).
 void clip_put_block(long x, long y, long xlen, long ylen, byte *imgpnt)
 {
     byte dataToDraw[4096];
 
-    _x = x;
-    _y = y;
-    _xlen = xlen;
-    _ylen = ylen;
-    if (x + xlen < 0 || y + ylen < 0 || x > 319 || y > 199) return;
+    if (x + xlen <= 0 || y + ylen <= 0 || x > 319 || y > 199) return;
     if (x > 0 && y > 0 && x + xlen < 320 && y + ylen < 200)
     {
+        _x = x;
+        _y = y;
+        _xlen = xlen;
+        _ylen = ylen;
         do_put_block(imgpnt);
         return;
     }
@@ -120,9 +120,9 @@ void clip_put_block(long x, long y, long xlen, long ylen, byte *imgpnt)
 
     long i = 0;
     long imgIx = xlen * clippedYOffset;
-    for (long cy = clippedYOffset; cy < clippedYlen; cy++) {
+    for (long cy = clippedYOffset; cy < clippedYOffset + clippedYlen; cy++) {
         imgIx += clippedXOffset;
-        for (long cx = clippedXOffset; cx < clippedXlen; cx++) {
+        for (long cx = clippedXOffset; cx < clippedXOffset + clippedXlen; cx++) {
             dataToDraw[i++] = *(imgpnt + imgIx++);
         }
         if (clippedXlen < xlen) imgIx += xlen - clippedXlen;

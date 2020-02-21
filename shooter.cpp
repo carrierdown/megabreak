@@ -24,9 +24,8 @@ void initMouse();
 short checkShotFired(short shotDelay, short curMouseX, short curMouseY);
 short updateBullets(short shotDelay, short shotVelocity);
 void clearShip(short curMouseX, short curMouseY, signed short deltaX, signed short deltaY);
-// To add:
+void initEnemy();
 void spawnEnemy();
-void clippingPutBlock();
 
 struct Bullet {
     short x;
@@ -55,13 +54,7 @@ int main(int argc, char *argv[])
     loadAssets();
     initVgaGraphicsMode();
     initMouse();
-
-    enemy.x = 100;
-    enemy.y = -26;
-    enemy.width = 16;
-    enemy.height = 25;
-    enemy.yVel = 2;
-    enemy.numHits = 1;
+    initEnemy();
 
     short curMouseX = MOUSE_X, curMouseY = MOUSE_Y;
     signed short deltaX = 0, deltaY = 0;
@@ -75,6 +68,7 @@ int main(int argc, char *argv[])
     short xOffset = 0;
     short yOffset = 0;
     short quit = FALSE;
+    short spawnNewEnemy = FALSE;
 
     while (quit == FALSE) {
         short key;
@@ -101,6 +95,11 @@ int main(int argc, char *argv[])
         }
         if (enemy.y < 200) enemy.y += enemy.yVel;
 
+        if (spawnNewEnemy) {
+            spawnEnemy();
+            spawnNewEnemy = FALSE;
+        }
+
         curMouseX = MOUSE_X;
         curMouseY = MOUSE_Y;
 
@@ -123,8 +122,10 @@ int main(int argc, char *argv[])
         if (kbhit()) {
             key = getch();
 
-            if (key == 27)      // ESC  - Quit
+            if (key == 27)      // ESC
                 quit = TRUE;
+            if (key == 32)      // SPACE
+                spawnNewEnemy = TRUE;
         }
     }
 
@@ -224,12 +225,18 @@ void clearShip(short curMouseX, short curMouseY, signed short deltaX, signed sho
     draw_box(curMouseX, smallestNumber(curMouseY, MOUSE_Y) + yOffset, SHIP_WIDTH, abs(deltaY) + 1, 0);
 }
 
-void spawnEnemy()
+void initEnemy()
 {
-
+    enemy.x = 0;
+    enemy.y = 200;
+    enemy.width = 16;
+    enemy.height = 25;
+    enemy.yVel = 2;
+    enemy.numHits = 1;
 }
 
-void clippingPutBlock()
+void spawnEnemy()
 {
-
+    enemy.x = 100;
+    enemy.y = -26;
 }
