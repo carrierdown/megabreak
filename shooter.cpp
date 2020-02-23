@@ -14,6 +14,11 @@ const short SHIP_HEIGHT = 32;
 const short SHIP_ANIMATION_TRESHOLD = 2;
 const short BULLET_WIDTH = 4;
 const short BULLET_HEIGHT = 3;
+const short EXPLOSION_WIDTH = 16;
+const short EXPLOSION_HEIGHT = 32;
+const short ENEMY_WIDTH = 16;
+const short ENEMY_HEIGHT = 25;
+
 
 short smallestNumber(short a, short b);
 short largestNumber(short a, short b);
@@ -41,9 +46,13 @@ struct Enemy {
     short height;
     short yVel;
     short numHits;
+    short state;
+    short frameDelay;
+    short doFinalClear;
 };
 
 byte ship[5][512];
+byte explosionFrames[4][512];
 byte enemyShip[400];
 byte bullet[12];
 signed char palette[768];
@@ -79,8 +88,23 @@ int main(int argc, char *argv[])
         shotDelay = updateBullets(shotDelay, shotVelocity);
 
         // draw enemy ship
-        if (enemy.y < 200) {
+        if (enemy.y < 200 && enemy.state == 1) {
             clip_put_block(enemy.x, enemy.y, enemy.width, enemy.height, enemyShip);
+        } else {
+            if (enemy.state > 1 && enemy.state <= 5) {
+                clip_put_block(enemy.x, enemy.y, enemy.width, enemy.height, explosionFrames[enemy.state - 2]);
+                enemy.frameDelay--;
+            }
+            if (enemy.frameDelay == 0) {
+                if (enemy.state == 5) {
+                    enemy.state = 0;
+                    enemy.doFinalClear = TRUE;
+                }
+                if (enemy.state > 0 && enemy.state < 5) {
+                    enemy.state++;
+                    enemy.frameDelay = 10;
+                }
+            }
         }
 
         // draw player ship
@@ -112,6 +136,10 @@ int main(int argc, char *argv[])
                 quit = TRUE;
             if (key == 32)      // SPACE
                 spawnNewEnemy = TRUE;
+            if (key == 97) {    // a
+                enemy.state = 2;
+                enemy.frameDelay = 10;
+            }
         }
     }
 
@@ -129,13 +157,17 @@ short largestNumber(short a, short b) {
 
 void loadAssets()
 {
-    pcxRead("bullets.pcx", bullet, palette, 4, 3);
-    pcxRead("eship.pcx", enemyShip, palette, 16, 25);
-    pcxRead("ship_ll.pcx", ship[0], palette, 16, 32);
-    pcxRead("ship_l.pcx", ship[1], palette, 16, 32);
-    pcxRead("ship.pcx", ship[2], palette, 16, 32);
-    pcxRead("ship_r.pcx", ship[3], palette, 16, 32);
-    pcxRead("ship_rr.pcx", ship[4], palette, 16, 32);
+    pcxRead("bullets.pcx", bullet, palette, BULLET_WIDTH, BULLET_HEIGHT);
+    pcxRead("eship.pcx", enemyShip, palette, ENEMY_WIDTH, ENEMY_HEIGHT);
+    pcxRead("ship_ll.pcx", ship[0], palette, SHIP_WIDTH, SHIP_HEIGHT);
+    pcxRead("ship_l.pcx", ship[1], palette, SHIP_WIDTH, SHIP_HEIGHT);
+    pcxRead("ship.pcx", ship[2], palette, SHIP_WIDTH, SHIP_HEIGHT);
+    pcxRead("ship_r.pcx", ship[3], palette, SHIP_WIDTH, SHIP_HEIGHT);
+    pcxRead("ship_rr.pcx", ship[4], palette, SHIP_WIDTH, SHIP_HEIGHT);
+    pcxRead("exp01.pcx", explosionFrames[0], palette, SHIP_WIDTH, SHIP_HEIGHT);
+    pcxRead("exp02.pcx", explosionFrames[1], palette, SHIP_WIDTH, SHIP_HEIGHT);
+    pcxRead("exp03.pcx", explosionFrames[2], palette, SHIP_WIDTH, SHIP_HEIGHT);
+    pcxRead("exp04.pcx", explosionFrames[3], palette, SHIP_WIDTH, SHIP_HEIGHT);
 }
 
 void initBullets()
@@ -185,11 +217,11 @@ short updateBullets(short shotDelay, short shotVelocity)
     if (shotDelay > 0) shotDelay--;
     for (short i = 0; i < 20; i++) {
         if (bullets[i].y > 0) {
-            draw_box(bullets[i].x, bullets[i].y, 4, 3, 0);
+            draw_box(bullets[i].x, bullets[i].y, BULLET_WIDTH, BULLET_HEIGHT, 0);
             bullets[i].y -= shotVelocity;
         }
         if (bullets[i].y > 0) {
-            put_block(bullets[i].x, bullets[i].y, 4, 3, bullet);
+            put_block(bullets[i].x, bullets[i].y, BULLET_WIDTH, BULLET_HEIGHT, bullet);
         }
     }
     return shotDelay;
@@ -215,8 +247,8 @@ void initEnemy()
 {
     enemy.x = 0;
     enemy.y = 200;
-    enemy.width = 16;
-    enemy.height = 25;
+    enemy.width = ENEMY_WIDTH;
+    enemy.height = ENEMY_HEIGHT;
     enemy.yVel = 2;
     enemy.numHits = 1;
 }
@@ -224,13 +256,19 @@ void initEnemy()
 void spawnEnemy()
 {
     enemy.x = 100;
-    enemy.y = -26;
+    enemy.y = -1 - ENEMY_HEIGHT;
+    enemy.state = 1;
+    enemy.frameDelay = 4;
+    enemy.doFinalClear = FALSE;
 }
 
 void clearAndMoveEnemy()
 {
-    if (enemy.y >= 0 && enemy.y < 200) {
+    if (enemy.y >= 0 && enemy.y < 200 && enemy.state > 0) {
         draw_box(enemy.x, enemy.y, enemy.width, enemy.yVel, 0);
+    }
+    if (enemy.doFinalClear == TRUE) {
+        draw_box(enemy.x, enemy.y, EXPLOSION_WIDTH, EXPLOSION_HEIGHT, 0);   
     }
     if (enemy.y < 200) enemy.y += enemy.yVel;
 }
